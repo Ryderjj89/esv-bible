@@ -12,6 +12,9 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
+// Serve static files from the React build
+app.use(express.static(path.join(__dirname, '../frontend/build')));
+
 // Bible data directory
 const BIBLE_DATA_DIR = path.join(__dirname, '../bible-data');
 
@@ -114,15 +117,15 @@ app.get('/books/:book/:chapter', async (req, res) => {
   }
 });
 
+// Catch-all handler: send back React's index.html for client-side routing
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/build/index.html'));
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: 'Something went wrong!' });
-});
-
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({ error: 'Endpoint not found' });
 });
 
 // Start server

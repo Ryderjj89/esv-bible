@@ -84,6 +84,10 @@ function configureAuth(app) {
     console.log('Subject:', sub);
     console.log('Profile:', profile);
     console.log('Access Token:', accessToken ? 'Present' : 'Missing');
+    console.log('Done callback type:', typeof done);
+    
+    // Store the done callback to ensure it doesn't get lost
+    const strategyDone = done;
     
     // Extract user info from profile - sub is actually the profile object in this case
     console.log('Raw profile object:', JSON.stringify(sub, null, 2));
@@ -97,12 +101,13 @@ function configureAuth(app) {
     console.log('Extracted user profile:', userProfile);
 
     userOps.findOrCreateUser(userProfile, (err, user) => {
+      console.log('Database callback - Done type:', typeof strategyDone);
       if (err) {
         console.error('Database error in findOrCreateUser:', err);
-        return done(err);
+        return strategyDone(err);
       }
       console.log('User from database:', user);
-      done(null, user);
+      strategyDone(null, user);
     });
   }));
 

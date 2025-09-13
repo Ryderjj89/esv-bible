@@ -89,7 +89,7 @@ const BookSelector: React.FC<BookSelectorProps> = ({ books, onBookSelect, format
           }
         }
       } else {
-        // Add favorite
+        // Add favorite - simplified like ChapterSelector
         const response = await fetch('/api/favorites', {
           method: 'POST',
           headers: {
@@ -104,10 +104,6 @@ const BookSelector: React.FC<BookSelectorProps> = ({ books, onBookSelect, format
         if (response.ok) {
           setFavorites(prev => new Set(prev).add(book));
           console.log('Added book favorite:', book);
-        } else if (response.status === 409) {
-          // 409 means it already exists, which is fine - just update the UI
-          setFavorites(prev => new Set(prev).add(book));
-          console.log('Book favorite already exists, updated UI:', book);
         } else {
           console.error('Failed to add favorite:', response.status, response.statusText);
         }

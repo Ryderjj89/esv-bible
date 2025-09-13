@@ -112,8 +112,8 @@ const userOps = {
               db.run(
                 'INSERT INTO user_preferences (user_id) VALUES (?)',
                 [newUser.id],
-                (err) => {
-                  if (err) console.error('Error creating default preferences:', err);
+                (prefErr) => {
+                  if (prefErr) console.error('Error creating default preferences:', prefErr);
                   callback(null, newUser);
                 }
               );

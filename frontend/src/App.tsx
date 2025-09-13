@@ -82,7 +82,7 @@ function App() {
   const [user, setUser] = useState<any>(null);
   const [authAvailable, setAuthAvailable] = useState(false);
   const [darkMode, setDarkMode] = useState(() => {
-    // Load dark mode preference from localStorage
+    // Load dark mode preference from localStorage as fallback
     const saved = localStorage.getItem('darkMode');
     return saved ? JSON.parse(saved) : false;
   });
@@ -99,6 +99,46 @@ function App() {
     checkAuthStatus();
   }, []);
 
+  // Load user preferences from database
+  const loadUserPreferences = async () => {
+    if (!user) return;
+    
+    try {
+      const response = await fetch('/api/preferences', {
+        credentials: 'include'
+      });
+      
+      if (response.ok) {
+        const preferences = await response.json();
+        console.log('Loaded user preferences:', preferences);
+        setDarkMode(preferences.dark_mode);
+      }
+    } catch (error) {
+      console.error('Failed to load user preferences:', error);
+    }
+  };
+
+  // Save user preferences to database
+  const saveUserPreferences = async (newDarkMode: boolean) => {
+    if (!user) return;
+    
+    try {
+      await fetch('/api/preferences', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          dark_mode: newDarkMode
+        })
+      });
+      console.log('Saved user preferences to database');
+    } catch (error) {
+      console.error('Failed to save user preferences:', error);
+    }
+  };
+
   const checkAuthStatus = async () => {
     try {
       const response = await fetch('/auth/user', {
@@ -109,6 +149,8 @@ function App() {
         const userData = await response.json();
         setUser(userData.user);
         setAuthAvailable(true);
+        // Load user preferences after setting user
+        setTimeout(() => loadUserPreferences(), 100);
       } else if (response.status === 501) {
         // Authentication not configured
         setAuthAvailable(false);
@@ -144,15 +186,33 @@ function App() {
     }
   };
 
+  // Handle dark mode toggle with hybrid storage
+  const handleDarkModeToggle = async () => {
+    const newDarkMode = !darkMode;
+    setDarkMode(newDarkMode);
+    
+    if (user) {
+      // Save to database for authenticated users
+      await saveUserPreferences(newDarkMode);
+    } else {
+      // Save to localStorage for non-authenticated users
+      localStorage.setItem('darkMode', JSON.stringify(newDarkMode));
+    }
+  };
+
   useEffect(() => {
-    // Apply dark mode and save preference
+    // Apply dark mode
     if (darkMode) {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
     }
-    localStorage.setItem('darkMode', JSON.stringify(darkMode));
-  }, [darkMode]);
+    
+    // Save to localStorage as backup (for non-authenticated users)
+    if (!user) {
+      localStorage.setItem('darkMode', JSON.stringify(darkMode));
+    }
+  }, [darkMode, user]);
 
   // Helper function to format book names for display
   const formatBookName = (bookName: string): string => {
@@ -322,7 +382,7 @@ function App() {
 
               {/* Dark Mode Toggle */}
               <button
-                onClick={() => setDarkMode(!darkMode)}
+                onClick={handleDarkModeToggle}
                 className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               >
                 {darkMode ? (

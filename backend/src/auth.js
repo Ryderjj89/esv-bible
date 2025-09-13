@@ -86,10 +86,12 @@ function configureAuth(app) {
     console.log('Access Token:', accessToken ? 'Present' : 'Missing');
     
     // Extract user info from profile
+    console.log('Raw profile object:', JSON.stringify(profile, null, 2));
+    
     const userProfile = {
-      sub: profile.id,
+      sub: sub, // Use the sub parameter directly
       email: profile.emails?.[0]?.value,
-      name: profile.displayName
+      name: profile.displayName || profile.name?.givenName || profile.username
     };
 
     console.log('Extracted user profile:', userProfile);

@@ -173,13 +173,14 @@ app.get('/api/favorites', requireAuth, (req, res) => {
 app.post('/api/favorites', requireAuth, (req, res) => {
   const { book, chapter, verse_start, verse_end, note } = req.body;
   
-  if (!book || !chapter) {
-    return res.status(400).json({ error: 'Book and chapter are required' });
+  // Book is required, but chapter is optional (for book-level favorites)
+  if (!book) {
+    return res.status(400).json({ error: 'Book is required' });
   }
 
   const favorite = {
     book,
-    chapter,
+    chapter: chapter || null,
     verse_start: verse_start || null,
     verse_end: verse_end || null,
     note: note || null
@@ -213,14 +214,14 @@ app.delete('/api/favorites/:id', requireAuth, (req, res) => {
 app.get('/api/favorites/check', requireAuth, (req, res) => {
   const { book, chapter, verse_start, verse_end } = req.query;
   
-  if (!book || !chapter) {
-    return res.status(400).json({ error: 'Book and chapter are required' });
+  if (!book) {
+    return res.status(400).json({ error: 'Book is required' });
   }
 
   favoritesOps.isFavorited(
     req.user.id, 
     book, 
-    chapter, 
+    chapter || null, 
     verse_start || null, 
     verse_end || null,
     (err, isFavorited) => {

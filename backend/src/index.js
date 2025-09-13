@@ -96,15 +96,13 @@ app.get('/books/:book', async (req, res) => {
       return res.status(404).json({ error: `No chapters found for book '${book}'` });
     }
 
-    // Combine all chapters
-    let fullBook = `# ${book}\n\n`;
-    for (const chapterFile of chapterFiles) {
-      const chapterPath = path.join(bookDir, chapterFile);
-      const chapterContent = await readMarkdownFile(chapterPath);
-      fullBook += chapterContent + '\n\n';
-    }
+    // Extract chapter numbers from filenames (e.g., "Chapter_01.md" -> "1")
+    const chapters = chapterFiles.map(file => {
+      const match = file.match(/Chapter_(\d+)\.md$/);
+      return match ? parseInt(match[1], 10).toString() : null;
+    }).filter(Boolean);
 
-    res.type('text/markdown').send(fullBook);
+    res.json({ chapters });
   } catch (error) {
     res.status(404).json({ error: `Book '${req.params.book}' not found` });
   }

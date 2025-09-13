@@ -20,21 +20,16 @@ const ChapterSelector: React.FC<ChapterSelectorProps> = ({ book, onChapterSelect
   const loadChapters = async () => {
     try {
       setLoading(true);
-      const bookContent = await getBook(book);
-
-      // Parse markdown to extract chapter numbers
-      const lines = bookContent.split('\n');
-      const chapterNumbers: string[] = [];
-
-      for (const line of lines) {
-        // Look for chapter headers like "# 1" or "# 1\n"
-        const chapterMatch = line.match(/^#\s+(\d+)/);
-        if (chapterMatch) {
-          chapterNumbers.push(chapterMatch[1]);
-        }
+      const response = await getBook(book);
+      
+      // The API now returns { chapters: ["1", "2", "3", ...] }
+      if (response.chapters) {
+        setChapters(response.chapters);
+      } else {
+        // Fallback: generate chapter numbers 1-50 (most books have fewer than 50 chapters)
+        const fallbackChapters = Array.from({ length: 50 }, (_, i) => (i + 1).toString());
+        setChapters(fallbackChapters);
       }
-
-      setChapters(chapterNumbers);
     } catch (error) {
       console.error('Failed to load chapters:', error);
       // Fallback: generate chapter numbers 1-50 (most books have fewer than 50 chapters)

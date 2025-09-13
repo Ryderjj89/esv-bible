@@ -117,19 +117,36 @@ const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack, format
         <div className="flex items-center space-x-2">
           <span className="text-sm text-gray-600 dark:text-gray-400">Font Size:</span>
           <div className="flex space-x-1">
-            {(['small', 'medium', 'large'] as const).map((size) => (
-              <button
-                key={size}
-                onClick={() => setFontSize(size)}
-                className={`px-3 py-1 text-xs rounded ${
-                  fontSize === size
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-                } transition-colors`}
-              >
-                {size.charAt(0).toUpperCase() + size.slice(1)}
-              </button>
-            ))}
+            <button
+              onClick={() => setFontSize('small')}
+              className={`px-3 py-1 text-xs rounded ${
+                fontSize === 'small'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+              } transition-colors`}
+            >
+              Small
+            </button>
+            <button
+              onClick={() => setFontSize('medium')}
+              className={`px-3 py-1 text-xs rounded ${
+                fontSize === 'medium'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+              } transition-colors`}
+            >
+              Medium
+            </button>
+            <button
+              onClick={() => setFontSize('large')}
+              className={`px-3 py-1 text-xs rounded ${
+                fontSize === 'large'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+              } transition-colors`}
+            >
+              Large
+            </button>
           </div>
         </div>
       </div>

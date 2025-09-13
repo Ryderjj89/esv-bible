@@ -1,12 +1,14 @@
-version: '3.8'
-
 services:
   esv-bible:
     build: .
     ports:
       - "3000:3000"
     volumes:
-      - ./bible-data:/app/bible-data:ro
+      - bible_data:/app/bible-data
     environment:
       - NODE_ENV=production
     restart: unless-stopped
+
+volumes:
+  bible_data:
+    driver: local

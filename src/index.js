@@ -28,9 +28,28 @@ async function readMarkdownFile(filePath) {
 // Helper function to get all books
 async function getBooks() {
   try {
-    const files = await fs.readdir(BIBLE_DATA_DIR);
-    const markdownFiles = files.filter(file => file.endsWith('.md'));
-    return markdownFiles.map(file => file.replace('.md', ''));
+    const items = await fs.readdir(BIBLE_DATA_DIR);
+    const bookDirs = [];
+
+    for (const item of items) {
+      const itemPath = path.join(BIBLE_DATA_DIR, item);
+      const stat = await fs.stat(itemPath);
+
+      if (stat.isDirectory()) {
+        // Check if directory contains markdown files
+        try {
+          const files = await fs.readdir(itemPath);
+          if (files.some(file => file.endsWith('.md'))) {
+            bookDirs.push(item);
+          }
+        } catch (error) {
+          // Skip directories we can't read
+          continue;
+        }
+      }
+    }
+
+    return bookDirs;
   } catch (error) {
     throw new Error('Failed to read bible data directory');
   }
@@ -53,10 +72,31 @@ app.get('/books', async (req, res) => {
 app.get('/books/:book', async (req, res) => {
   try {
     const { book } = req.params;
-    const filePath = path.join(BIBLE_DATA_DIR, `${book}.md`);
+    const bookDir = path.join(BIBLE_DATA_DIR, book);
 
-    const content = await readMarkdownFile(filePath);
-    res.type('text/markdown').send(content);
+    // Check if book directory exists
+    const stat = await fs.stat(bookDir);
+    if (!stat.isDirectory()) {
+      return res.status(404).json({ error: `Book '${book}' not found` });
+    }
+
+    // Get all chapter files
+    const files = await fs.readdir(bookDir);
+    const chapterFiles = files.filter(file => file.endsWith('.md')).sort();
+
+    if (chapterFiles.length === 0) {
+      return res.status(404).json({ error: `No chapters found for book '${book}'` });
+    }
+
+    // Combine all chapters
+    let fullBook = `# ${book}\n\n`;
+    for (const chapterFile of chapterFiles) {
+      const chapterPath = path.join(bookDir, chapterFile);
+      const chapterContent = await readMarkdownFile(chapterPath);
+      fullBook += chapterContent + '\n\n';
+    }
+
+    res.type('text/markdown').send(fullBook);
   } catch (error) {
     res.status(404).json({ error: `Book '${req.params.book}' not found` });
   }
@@ -65,35 +105,12 @@ app.get('/books/:book', async (req, res) => {
 app.get('/books/:book/:chapter', async (req, res) => {
   try {
     const { book, chapter } = req.params;
-    const filePath = path.join(BIBLE_DATA_DIR, `${book}.md`);
+    const chapterPath = path.join(BIBLE_DATA_DIR, book, `${chapter}.md`);
 
-    const content = await readMarkdownFile(filePath);
-
-    // Simple chapter extraction (this could be improved with better parsing)
-    const lines = content.split('\n');
-    const chapterPattern = new RegExp(`^# ${chapter}\\s*$`, 'i');
-    const chapterLines = [];
-    let inChapter = false;
-
-    for (const line of lines) {
-      if (chapterPattern.test(line)) {
-        inChapter = true;
-        chapterLines.push(line);
-      } else if (inChapter && line.startsWith('# ')) {
-        // Next chapter starts
-        break;
-      } else if (inChapter) {
-        chapterLines.push(line);
-      }
-    }
-
-    if (chapterLines.length === 0) {
-      return res.status(404).json({ error: `Chapter ${chapter} not found in ${book}` });
-    }
-
-    res.type('text/markdown').send(chapterLines.join('\n'));
+    const content = await readMarkdownFile(chapterPath);
+    res.type('text/markdown').send(content);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(404).json({ error: `Chapter ${chapter} not found in book '${book}'` });
   }
 });
 

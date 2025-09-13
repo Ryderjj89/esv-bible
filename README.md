@@ -1,18 +1,20 @@
 # ESV Bible Markdown
 
-A Docker-based web service for serving the ESV Bible in Markdown format.
+A Docker-based web service for serving the ESV Bible in Markdown format with chapter-by-chapter organization.
 
 ## Features
 
-- Complete ESV Bible text in Markdown format
+- Complete ESV Bible text in Markdown format from [lguenth/mdbible](https://github.com/lguenth/mdbible)
+- Organized by book and chapter for easy navigation
 - Docker containerized for easy deployment
 - RESTful API for accessing Bible content
+- Persistent volume storage for Bible data
 - Optimized for remote hosting
 
 ## Setup
 
 1. Clone this repository
-2. Place ESV Bible Markdown files in the `bible-data` directory
+2. The ESV Bible data will be automatically downloaded during Docker build from the GitHub repository
 3. Run `docker-compose up --build`
 
 ## Usage
@@ -21,9 +23,23 @@ The service will be available at `http://localhost:3000`
 
 ### API Endpoints
 
-- `GET /books` - List all books
-- `GET /books/:book` - Get specific book
+- `GET /health` - Health check endpoint
+- `GET /books` - List all available books
+- `GET /books/:book` - Get complete book (all chapters combined)
 - `GET /books/:book/:chapter` - Get specific chapter
+
+### Example Usage
+
+```bash
+# List all books
+curl http://localhost:3000/books
+
+# Get the book of Genesis
+curl http://localhost:3000/books/Genesis
+
+# Get Genesis chapter 1
+curl http://localhost:3000/books/Genesis/1
+```
 
 ## Development
 
@@ -39,6 +55,12 @@ Build and run with Docker Compose:
 ```bash
 docker-compose up --build
 ```
+
+The Bible data is stored in a persistent Docker volume named `bible_data` for efficient storage and updates.
+
+## Data Source
+
+Bible content is sourced from [lguenth/mdbible](https://github.com/lguenth/mdbible/tree/main/by_chapter), which provides the ESV Bible organized by book and chapter in Markdown format.
 
 ## License
 

@@ -11,72 +11,6 @@ interface BookData {
   books: string[];
 }
 
-// Component for the home page
-function HomePage({ books, formatBookName, getBookUrlName }: { books: string[], formatBookName: (name: string) => string, getBookUrlName: (name: string) => string }) {
-  const navigate = useNavigate();
-  
-  const handleBookSelect = (book: string) => {
-    const urlName = getBookUrlName(book);
-    navigate(`/book/${urlName}`);
-  };
-
-  return <BookSelector books={books} onBookSelect={handleBookSelect} formatBookName={formatBookName} />;
-}
-
-// Component for book chapters page
-function BookPage({ books, formatBookName, getBookFromUrl }: { books: string[], formatBookName: (name: string) => string, getBookFromUrl: (urlName: string) => string }) {
-  const { bookName } = useParams<{ bookName: string }>();
-  const navigate = useNavigate();
-
-  const actualBookName = bookName ? getBookFromUrl(bookName) : '';
-
-  const handleChapterSelect = (chapter: string) => {
-    navigate(`/book/${bookName}/chapter/${chapter}`);
-  };
-
-  const handleBack = () => {
-    navigate('/');
-  };
-
-  if (!bookName || !actualBookName || !books.includes(actualBookName)) {
-    return <div>Book not found</div>;
-  }
-
-  return (
-    <ChapterSelector
-      book={actualBookName}
-      onChapterSelect={handleChapterSelect}
-      onBack={handleBack}
-      formatBookName={formatBookName}
-    />
-  );
-}
-
-// Component for chapter reading page
-function ChapterPage({ formatBookName, getBookFromUrl }: { formatBookName: (name: string) => string, getBookFromUrl: (urlName: string) => string }) {
-  const { bookName, chapterNumber } = useParams<{ bookName: string, chapterNumber: string }>();
-  const navigate = useNavigate();
-
-  const actualBookName = bookName ? getBookFromUrl(bookName) : '';
-
-  const handleBack = () => {
-    navigate(`/book/${bookName}`);
-  };
-
-  if (!bookName || !chapterNumber || !actualBookName) {
-    return <div>Chapter not found</div>;
-  }
-
-  return (
-    <BibleReader
-      book={actualBookName}
-      chapter={chapterNumber}
-      onBack={handleBack}
-      formatBookName={formatBookName}
-    />
-  );
-}
-
 function App() {
   const [books, setBooks] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -274,6 +208,75 @@ function App() {
 
   const { currentBook, currentChapter } = getCurrentNavInfo();
 
+  // Component for the home page
+  const HomePage = () => {
+    const handleBookSelect = (book: string) => {
+      const urlName = getBookUrlName(book);
+      navigate(`/book/${urlName}`);
+    };
+
+    return (
+      <BookSelector 
+        books={books} 
+        onBookSelect={handleBookSelect} 
+        formatBookName={formatBookName}
+        user={user}
+      />
+    );
+  };
+
+  // Component for book chapters page
+  const BookPage = () => {
+    const { bookName } = useParams<{ bookName: string }>();
+    const actualBookName = bookName ? getBookFromUrl(bookName) : '';
+
+    const handleChapterSelect = (chapter: string) => {
+      navigate(`/book/${bookName}/chapter/${chapter}`);
+    };
+
+    const handleBack = () => {
+      navigate('/');
+    };
+
+    if (!bookName || !actualBookName || !books.includes(actualBookName)) {
+      return <div>Book not found</div>;
+    }
+
+    return (
+      <ChapterSelector
+        book={actualBookName}
+        onChapterSelect={handleChapterSelect}
+        onBack={handleBack}
+        formatBookName={formatBookName}
+        user={user}
+      />
+    );
+  };
+
+  // Component for chapter reading page
+  const ChapterPage = () => {
+    const { bookName, chapterNumber } = useParams<{ bookName: string, chapterNumber: string }>();
+    const actualBookName = bookName ? getBookFromUrl(bookName) : '';
+
+    const handleBack = () => {
+      navigate(`/book/${bookName}`);
+    };
+
+    if (!bookName || !chapterNumber || !actualBookName) {
+      return <div>Chapter not found</div>;
+    }
+
+    return (
+      <BibleReader
+        book={actualBookName}
+        chapter={chapterNumber}
+        onBack={handleBack}
+        formatBookName={formatBookName}
+        user={user}
+      />
+    );
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -407,9 +410,9 @@ function App() {
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Routes>
-          <Route path="/" element={<HomePage books={books} formatBookName={formatBookName} getBookUrlName={getBookUrlName} />} />
-          <Route path="/book/:bookName" element={<BookPage books={books} formatBookName={formatBookName} getBookFromUrl={getBookFromUrl} />} />
-          <Route path="/book/:bookName/chapter/:chapterNumber" element={<ChapterPage formatBookName={formatBookName} getBookFromUrl={getBookFromUrl} />} />
+          <Route path="/" element={<HomePage />} />
+          <Route path="/book/:bookName" element={<BookPage />} />
+          <Route path="/book/:bookName/chapter/:chapterNumber" element={<ChapterPage />} />
         </Routes>
       </main>
     </div>

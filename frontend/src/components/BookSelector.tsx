@@ -4,9 +4,10 @@ import { BookOpen } from 'lucide-react';
 interface BookSelectorProps {
   books: string[];
   onBookSelect: (book: string) => void;
+  formatBookName: (bookName: string) => string;
 }
 
-const BookSelector: React.FC<BookSelectorProps> = ({ books, onBookSelect }) => {
+const BookSelector: React.FC<BookSelectorProps> = ({ books, onBookSelect, formatBookName }) => {
   // Group books by testament
   const oldTestament = books.slice(0, 39); // First 39 books
   const newTestament = books.slice(39); // Remaining books
@@ -25,7 +26,7 @@ const BookSelector: React.FC<BookSelectorProps> = ({ books, onBookSelect }) => {
           >
             <BookOpen className="mx-auto h-8 w-8 text-blue-600 dark:text-blue-400 mb-2 group-hover:scale-110 transition-transform" />
             <span className="text-sm font-medium text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400">
-              {book}
+              {formatBookName(book)}
             </span>
           </button>
         ))}

@@ -6,9 +6,10 @@ interface BibleReaderProps {
   book: string;
   chapter: string;
   onBack: () => void;
+  formatBookName: (bookName: string) => string;
 }
 
-const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack }) => {
+const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack, formatBookName }) => {
   const [content, setContent] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [fontSize, setFontSize] = useState<'small' | 'medium' | 'large'>('medium');
@@ -136,7 +137,7 @@ const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack }) => {
       {/* Chapter Title */}
       <div className="text-center mb-8">
         <h1 className="book-title">
-          {book} {chapter}
+          {formatBookName(book)} {chapter}
         </h1>
       </div>
 

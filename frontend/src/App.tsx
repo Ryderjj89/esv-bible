@@ -14,7 +14,11 @@ function App() {
   const [selectedBook, setSelectedBook] = useState<string>('');
   const [selectedChapter, setSelectedChapter] = useState<string>('');
   const [loading, setLoading] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => {
+    // Load dark mode preference from localStorage
+    const saved = localStorage.getItem('darkMode');
+    return saved ? JSON.parse(saved) : false;
+  });
   const [error, setError] = useState<string>('');
 
   // Debug logging
@@ -26,12 +30,20 @@ function App() {
   }, []);
 
   useEffect(() => {
+    // Apply dark mode and save preference
     if (darkMode) {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
     }
+    localStorage.setItem('darkMode', JSON.stringify(darkMode));
   }, [darkMode]);
+
+  // Helper function to format book names for display
+  const formatBookName = (bookName: string): string => {
+    // Remove leading numbers and underscores, replace underscores with spaces
+    return bookName.replace(/^\d+_/, '').replace(/_/g, ' ');
+  };
 
   const loadBooks = async () => {
     try {
@@ -101,7 +113,7 @@ function App() {
                   </button>
                   <ChevronRight className="h-4 w-4" />
                   <span className="font-medium text-gray-900 dark:text-gray-100">
-                    {selectedBook}
+                    {formatBookName(selectedBook)}
                   </span>
                   {selectedChapter && (
                     <>
@@ -140,18 +152,20 @@ function App() {
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {!selectedBook ? (
-          <BookSelector books={books} onBookSelect={handleBookSelect} />
+          <BookSelector books={books} onBookSelect={handleBookSelect} formatBookName={formatBookName} />
         ) : !selectedChapter ? (
           <ChapterSelector
             book={selectedBook}
             onChapterSelect={handleChapterSelect}
             onBack={handleBackToBooks}
+            formatBookName={formatBookName}
           />
         ) : (
           <BibleReader
             book={selectedBook}
             chapter={selectedChapter}
             onBack={handleBackToChapters}
+            formatBookName={formatBookName}
           />
         )}
       </main>

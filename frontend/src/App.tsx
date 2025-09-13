@@ -112,9 +112,13 @@ function App() {
       } else if (response.status === 501) {
         // Authentication not configured
         setAuthAvailable(false);
-      } else {
+      } else if (response.status === 401) {
         // Authentication configured but user not logged in
         setAuthAvailable(true);
+        setUser(null);
+      } else {
+        // Other error
+        setAuthAvailable(false);
       }
     } catch (error) {
       console.log('Auth check failed:', error);

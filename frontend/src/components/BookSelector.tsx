@@ -88,8 +88,11 @@ const BookSelector: React.FC<BookSelectorProps> = ({ books, onBookSelect, format
           })
         });
         
-        if (response.ok) {
+        if (response.ok || response.status === 409) {
+          // 409 means it already exists, which is fine - just update the UI
           setFavorites(prev => new Set(prev).add(book));
+        } else {
+          console.error('Failed to add favorite:', response.status, response.statusText);
         }
       }
     } catch (error) {

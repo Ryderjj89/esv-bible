@@ -34,6 +34,13 @@ function App() {
     checkAuthStatus();
   }, []);
 
+  // Load user preferences when user changes
+  useEffect(() => {
+    if (user) {
+      loadUserPreferences();
+    }
+  }, [user]);
+
   // Load user preferences from database
   const loadUserPreferences = async () => {
     if (!user) return;
@@ -84,8 +91,6 @@ function App() {
         const userData = await response.json();
         setUser(userData.user);
         setAuthAvailable(true);
-        // Load user preferences after setting user
-        setTimeout(() => loadUserPreferences(), 100);
       } else if (response.status === 501) {
         // Authentication not configured
         setAuthAvailable(false);

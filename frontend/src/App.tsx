@@ -79,6 +79,8 @@ function ChapterPage({ formatBookName, getBookFromUrl }: { formatBookName: (name
 function App() {
   const [books, setBooks] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<any>(null);
+  const [authAvailable, setAuthAvailable] = useState(false);
   const [darkMode, setDarkMode] = useState(() => {
     // Load dark mode preference from localStorage
     const saved = localStorage.getItem('darkMode');
@@ -94,7 +96,49 @@ function App() {
   useEffect(() => {
     console.log('App useEffect triggered');
     loadBooks();
+    checkAuthStatus();
   }, []);
+
+  const checkAuthStatus = async () => {
+    try {
+      const response = await fetch('/auth/user', {
+        credentials: 'include'
+      });
+      
+      if (response.ok) {
+        const userData = await response.json();
+        setUser(userData.user);
+        setAuthAvailable(true);
+      } else if (response.status === 501) {
+        // Authentication not configured
+        setAuthAvailable(false);
+      } else {
+        // Authentication configured but user not logged in
+        setAuthAvailable(true);
+      }
+    } catch (error) {
+      console.log('Auth check failed:', error);
+      setAuthAvailable(false);
+    }
+  };
+
+  const handleLogin = () => {
+    window.location.href = '/auth/login';
+  };
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/auth/logout', {
+        method: 'POST',
+        credentials: 'include'
+      });
+      setUser(null);
+      // Optionally reload the page to reset any user-specific state
+      window.location.reload();
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
 
   useEffect(() => {
     // Apply dark mode and save preference
@@ -244,17 +288,46 @@ function App() {
               )}
             </div>
 
-            {/* Dark Mode Toggle */}
-            <button
-              onClick={() => setDarkMode(!darkMode)}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-            >
-              {darkMode ? (
-                <Sun className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-500" />
-              ) : (
-                <Moon className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600" />
+            {/* User Authentication & Dark Mode */}
+            <div className="flex items-center space-x-2">
+              {/* Authentication Button */}
+              {authAvailable && (
+                <div className="hidden sm:block">
+                  {user ? (
+                    <div className="flex items-center space-x-2">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">
+                        {user.name || user.email}
+                      </span>
+                      <button
+                        onClick={handleLogout}
+                        className="text-sm px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={handleLogin}
+                      className="text-sm px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                    >
+                      Login
+                    </button>
+                  )}
+                </div>
               )}
-            </button>
+
+              {/* Dark Mode Toggle */}
+              <button
+                onClick={() => setDarkMode(!darkMode)}
+                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              >
+                {darkMode ? (
+                  <Sun className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-500" />
+                ) : (
+                  <Moon className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600" />
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </header>

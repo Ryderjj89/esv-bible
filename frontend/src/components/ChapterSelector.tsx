@@ -36,11 +36,11 @@ const ChapterSelector: React.FC<ChapterSelectorProps> = ({ book, onChapterSelect
       
       if (response.ok) {
         const data = await response.json();
-        const chapterFavorites = new Set(
-          data.favorites
-            .filter((fav: any) => fav.book === book && fav.chapter && !fav.verse_start) // Only chapter-level favorites for this book
-            .map((fav: any) => fav.chapter)
-        );
+        const favoriteChapters: string[] = data.favorites
+          .filter((fav: any) => fav.book === book && fav.chapter && !fav.verse_start) // Only chapter-level favorites for this book
+          .map((fav: any) => fav.chapter);
+        
+        const chapterFavorites = new Set<string>(favoriteChapters);
         setFavorites(chapterFavorites);
       }
     } catch (error) {

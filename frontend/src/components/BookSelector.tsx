@@ -30,11 +30,11 @@ const BookSelector: React.FC<BookSelectorProps> = ({ books, onBookSelect, format
       
       if (response.ok) {
         const data = await response.json();
-        const bookFavorites = new Set(
-          data.favorites
-            .filter((fav: any) => !fav.chapter) // Only book-level favorites
-            .map((fav: any) => fav.book)
-        );
+        const favoriteBooks: string[] = data.favorites
+          .filter((fav: any) => !fav.chapter) // Only book-level favorites
+          .map((fav: any) => fav.book);
+        
+        const bookFavorites = new Set<string>(favoriteBooks);
         setFavorites(bookFavorites);
       }
     } catch (error) {

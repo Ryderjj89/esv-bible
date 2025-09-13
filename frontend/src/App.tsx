@@ -182,18 +182,18 @@ function App() {
       <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-4">
-              <Book className="h-8 w-8 text-blue-600" />
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <Book className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600" />
               <button 
                 onClick={() => navigate('/')}
-                className="text-xl font-bold text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400"
+                className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400"
               >
                 ESV Bible
               </button>
             </div>
 
-            {/* Navigation Breadcrumb */}
-            <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
+            {/* Navigation Breadcrumb - Hidden on small screens */}
+            <div className="hidden md:flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
               {currentBook && (
                 <>
                   <button
@@ -225,15 +225,34 @@ function App() {
               )}
             </div>
 
+            {/* Mobile Navigation - Simplified */}
+            <div className="flex md:hidden items-center space-x-1 text-xs text-gray-600 dark:text-gray-400">
+              {currentBook && (
+                <>
+                  <span className="font-medium text-gray-900 dark:text-gray-100">
+                    {formatBookName(currentBook)}
+                  </span>
+                  {currentChapter && (
+                    <>
+                      <span>•</span>
+                      <span className="font-medium text-gray-900 dark:text-gray-100">
+                        Ch. {currentChapter}
+                      </span>
+                    </>
+                  )}
+                </>
+              )}
+            </div>
+
             {/* Dark Mode Toggle */}
             <button
               onClick={() => setDarkMode(!darkMode)}
               className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
               {darkMode ? (
-                <Sun className="h-5 w-5 text-yellow-500" />
+                <Sun className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-500" />
               ) : (
-                <Moon className="h-5 w-5 text-gray-600" />
+                <Moon className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600" />
               )}
             </button>
           </div>

@@ -8,7 +8,7 @@ RUN apk add --no-cache git
 FROM base AS backend
 WORKDIR /app/backend
 COPY backend/package*.json ./
-RUN npm ci --only=production
+RUN npm install --omit=dev
 
 # Frontend build stage
 FROM base AS frontend-build
@@ -17,7 +17,7 @@ COPY frontend/package*.json ./
 COPY frontend/tsconfig.json ./
 COPY frontend/tailwind.config.js ./
 COPY frontend/postcss.config.js ./
-RUN npm ci
+RUN npm install
 COPY frontend/public ./public
 COPY frontend/src ./src
 RUN npm run build

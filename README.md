@@ -1,95 +1,185 @@
-# ESV Bible Markdown
+# ESV Bible in Markdown
 
-A Docker-based web service for serving the ESV Bible in Markdown format with chapter-by-chapter organization.
-
-## Project Structure
-
-```
-esv-bible/
-├── backend/           # Backend API server
-│   ├── src/
-│   │   └── index.js   # Express server
-│   ├── package.json
-│   └── Dockerfile
-├── frontend/          # React frontend application
-│   ├── src/
-│   ├── public/
-│   ├── package.json
-│   └── ...
-├── bible-data/        # ESV Bible markdown files (auto-downloaded)
-├── docker-compose.yml
-└── README.md
-```
+A Docker-based ESV Bible application with markdown content, featuring a React frontend and Node.js backend.
 
 ## Features
 
-- Complete ESV Bible text in Markdown format from [lguenth/mdbible](https://github.com/lguenth/mdbible)
-- Organized by book and chapter for easy navigation
-- Docker containerized for easy deployment
-- Modern React frontend with responsive design
-- RESTful API for accessing Bible content
-- Persistent volume storage for Bible data
-- Optimized for remote hosting
+- **Complete ESV Bible** in markdown format
+- **Clean URLs** like `/book/Genesis/chapter/1`
+- **Mobile responsive** design with adaptive navigation
+- **Dark mode** support with persistent preferences
+- **Font size controls** (Small, Medium, Large)
+- **Chapter navigation** with Previous/Next buttons
+- **Times New Roman typography** for traditional Bible reading
+- **Professional favicon** with book icon
+- **Optional OpenID Connect authentication** for user features
+- **User preferences** sync (when authenticated)
+- **Favorites system** for bookmarking verses (when authenticated)
 
-## Setup
+## Quick Start
 
-1. Clone this repository
-2. Run `docker-compose up` (uses pre-built image from Docker Hub)
-3. The ESV Bible data is included in the Docker image
+### Basic Setup (No Authentication)
 
-## Usage
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/Ryderjj89/esv-bible.git
+   cd esv-bible
+   ```
 
-The service will be available at `http://localhost:3000`
+2. **Build and run with Docker**
+   ```bash
+   docker build -t esv-bible .
+   docker run -p 3000:3000 esv-bible
+   ```
 
-### API Endpoints
+3. **Access the application**
+   - Open http://localhost:3000 in your browser
 
-- `GET /health` - Health check endpoint
-- `GET /books` - List all available books
-- `GET /books/:book` - Get complete book (all chapters combined)
-- `GET /books/:book/:chapter` - Get specific chapter
+### Docker Compose Setup
 
-### Example Usage
+1. **Run with docker-compose**
+   ```bash
+   docker-compose up -d
+   ```
 
-```bash
-# List all books
-curl http://localhost:3000/books
+2. **Access the application**
+   - Open http://localhost:3000 in your browser
 
-# Get the book of Genesis
-curl http://localhost:3000/books/Genesis
+## Authentication Setup (Optional)
 
-# Get Genesis chapter 1
-curl http://localhost:3000/books/Genesis/1
+To enable user authentication and features like favorites and synced preferences, configure OpenID Connect:
+
+### Environment Variables
+
+Create a `.env` file in the root directory with the following variables:
+
+```env
+# OpenID Connect Configuration (Required for authentication)
+OIDC_ISSUER=https://your-oidc-provider.com
+OIDC_CLIENT_ID=your-client-id
+OIDC_CLIENT_SECRET=your-client-secret
+OIDC_AUTH_URL=https://your-oidc-provider.com/auth
+OIDC_TOKEN_URL=https://your-oidc-provider.com/token
+OIDC_USERINFO_URL=https://your-oidc-provider.com/userinfo
+
+# Optional Configuration
+OIDC_CALLBACK_URL=/auth/callback
+SESSION_SECRET=your-session-secret-change-in-production
+FRONTEND_URL=http://localhost:3000
+NODE_ENV=production
+```
+
+## Features When Authenticated
+
+### User Preferences
+- **Font size** synced across devices
+- **Dark mode** preference synced across devices
+- **Persistent settings** stored in database
+
+### Favorites System
+- **Bookmark verses** for easy reference
+- **Add notes** to favorite verses
+- **Organize favorites** by book and chapter
+- **Quick access** to saved verses
+
+### API Endpoints (Authenticated)
+
+```
+GET    /auth/user           - Get current user info
+POST   /auth/logout         - Logout user
+GET    /api/preferences     - Get user preferences
+PUT    /api/preferences     - Update user preferences
+GET    /api/favorites       - Get user favorites
+POST   /api/favorites       - Add favorite verse
+DELETE /api/favorites/:id   - Remove favorite
+GET    /api/favorites/check - Check if verse is favorited
 ```
 
 ## Development
 
-### Backend Development
-```bash
-cd backend
-npm install
-npm run dev
-```
+### Prerequisites
+- Node.js 16+
+- Docker (optional)
 
-### Frontend Development
-```bash
-cd frontend
-npm install
-npm start
-```
+### Local Development
 
-## Docker Deployment
+1. **Install dependencies**
+   ```bash
+   # Backend
+   cd backend
+   npm install
+   
+   # Frontend
+   cd ../frontend
+   npm install
+   ```
 
-Run with Docker Compose using pre-built Docker Hub image:
-```bash
-docker-compose up
-```
+2. **Start development servers**
+   ```bash
+   # Backend (from backend directory)
+   npm run dev
+   
+   # Frontend (from frontend directory)
+   npm start
+   ```
 
-The application uses the `ryderjj89/esv-bible:latest` image from Docker Hub. The Bible data is included in the Docker image and stored in a persistent Docker volume named `bible_data` for efficient storage and updates.
+3. **Access the application**
+   - Frontend: http://localhost:3000
+   - Backend API: http://localhost:3001
 
-## Data Source
+## Database
 
-Bible content is sourced from [lguenth/mdbible](https://github.com/lguenth/mdbible/tree/main/by_chapter), which provides the ESV Bible organized by book and chapter in Markdown format.
+The application uses SQLite for user data when authentication is enabled:
+
+- **Location**: `backend/data/bible.db`
+- **Tables**: `users`, `user_preferences`, `favorites`
+- **Automatic setup**: Database and tables created on first run
+
+## Docker Configuration
+
+### Dockerfile
+- Multi-stage build for optimized production image
+- Node.js backend with React frontend
+- Persistent volume for database storage
+
+### docker-compose.yml
+- Single service configuration
+- Volume mounting for database persistence
+- Environment variable support
+
+## URL Structure
+
+- **Home**: `/` - Book selection
+- **Book chapters**: `/book/Genesis` - Chapter selection for Genesis
+- **Chapter reading**: `/book/Genesis/chapter/1` - Genesis Chapter 1
+- **Clean URLs**: Professional book names without technical prefixes
+
+## Browser Support
+
+- **Modern browsers** with ES6+ support
+- **Mobile responsive** design
+- **Touch-friendly** navigation
+- **Keyboard accessible** controls
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
 
 ## License
 
-MIT
+MIT License - see LICENSE file for details
+
+## Support
+
+For issues and questions:
+- Create an issue on GitHub
+- Check existing documentation
+- Review environment variable configuration
+
+---
+
+**Note**: Authentication is completely optional. The application works fully without any authentication setup, providing a clean Bible reading experience. Authentication only adds user-specific features like favorites and synced preferences.

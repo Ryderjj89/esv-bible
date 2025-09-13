@@ -20,7 +20,13 @@ const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack }) => {
   const loadChapter = async () => {
     try {
       setLoading(true);
-      const chapterContent = await getChapter(book, chapter);
+      console.log(`Loading chapter: ${book}/${chapter}`);
+      
+      // Pad chapter number with leading zero if needed
+      const paddedChapter = chapter.padStart(2, '0');
+      console.log(`Padded chapter: ${paddedChapter}`);
+      
+      const chapterContent = await getChapter(book, paddedChapter);
       setContent(chapterContent);
     } catch (error) {
       console.error('Failed to load chapter:', error);

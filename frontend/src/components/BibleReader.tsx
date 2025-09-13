@@ -22,11 +22,12 @@ const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack }) => {
       setLoading(true);
       console.log(`Loading chapter: ${book}/${chapter}`);
       
-      // Pad chapter number with leading zero if needed
+      // Format chapter as "Chapter_XX" with leading zero
       const paddedChapter = chapter.padStart(2, '0');
-      console.log(`Padded chapter: ${paddedChapter}`);
+      const chapterFileName = `Chapter_${paddedChapter}`;
+      console.log(`Chapter file name: ${chapterFileName}`);
       
-      const chapterContent = await getChapter(book, paddedChapter);
+      const chapterContent = await getChapter(book, chapterFileName);
       setContent(chapterContent);
     } catch (error) {
       console.error('Failed to load chapter:', error);

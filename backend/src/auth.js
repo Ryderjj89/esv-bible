@@ -79,15 +79,25 @@ function configureAuth(app) {
     scope: 'openid email profile',
     skipUserProfile: false
   }, (issuer, sub, profile, accessToken, refreshToken, done) => {
-    console.log('OIDC Strategy callback:');
-    console.log('Issuer:', issuer);
-    console.log('Subject:', sub);
-    console.log('Profile:', profile);
-    console.log('Access Token:', accessToken ? 'Present' : 'Missing');
-    console.log('Done callback type:', typeof done);
+    console.log('OIDC Strategy callback - All parameters:');
+    console.log('Parameter 1 (issuer):', typeof issuer, issuer);
+    console.log('Parameter 2 (sub):', typeof sub, sub);
+    console.log('Parameter 3 (profile):', typeof profile, profile);
+    console.log('Parameter 4 (accessToken):', typeof accessToken, accessToken);
+    console.log('Parameter 5 (refreshToken):', typeof refreshToken, refreshToken);
+    console.log('Parameter 6 (done):', typeof done, done);
     
-    // Store the done callback to ensure it doesn't get lost
-    const strategyDone = done;
+    // Find the actual callback function - it might be in a different position
+    const args = Array.from(arguments);
+    console.log('All arguments:', args.map((arg, i) => `${i}: ${typeof arg}`));
+    
+    const callback = args.find(arg => typeof arg === 'function');
+    console.log('Found callback function:', typeof callback);
+    
+    if (!callback) {
+      console.error('No callback function found in arguments!');
+      return;
+    }
     
     // Extract user info from profile - sub is actually the profile object in this case
     console.log('Raw profile object:', JSON.stringify(sub, null, 2));
@@ -101,13 +111,12 @@ function configureAuth(app) {
     console.log('Extracted user profile:', userProfile);
 
     userOps.findOrCreateUser(userProfile, (err, user) => {
-      console.log('Database callback - Done type:', typeof strategyDone);
       if (err) {
         console.error('Database error in findOrCreateUser:', err);
-        return strategyDone(err);
+        return callback(err);
       }
       console.log('User from database:', user);
-      strategyDone(null, user);
+      callback(null, user);
     });
   }));
 

@@ -12,12 +12,21 @@ const BookSelector: React.FC<BookSelectorProps> = ({ books, onBookSelect, format
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
 
-  // Load favorites when user is available
+  // Load favorites when user is available or when component mounts
   useEffect(() => {
     if (user) {
       loadFavorites();
+    } else {
+      setFavorites(new Set()); // Clear favorites when no user
     }
   }, [user]);
+
+  // Also reload favorites when books change (page refresh)
+  useEffect(() => {
+    if (user && books.length > 0) {
+      loadFavorites();
+    }
+  }, [books, user]);
 
   const loadFavorites = async () => {
     if (!user) return;
@@ -36,6 +45,7 @@ const BookSelector: React.FC<BookSelectorProps> = ({ books, onBookSelect, format
         
         const bookFavorites = new Set<string>(favoriteBooks);
         setFavorites(bookFavorites);
+        console.log('Loaded book favorites:', favoriteBooks);
       }
     } catch (error) {
       console.error('Failed to load favorites:', error);
@@ -63,16 +73,19 @@ const BookSelector: React.FC<BookSelectorProps> = ({ books, onBookSelect, format
           const bookFavorite = data.favorites.find((fav: any) => fav.book === book && !fav.chapter);
           
           if (bookFavorite) {
-            await fetch(`/api/favorites/${bookFavorite.id}`, {
+            const deleteResponse = await fetch(`/api/favorites/${bookFavorite.id}`, {
               method: 'DELETE',
               credentials: 'include'
             });
             
-            setFavorites(prev => {
-              const newFavorites = new Set(prev);
-              newFavorites.delete(book);
-              return newFavorites;
-            });
+            if (deleteResponse.ok) {
+              setFavorites(prev => {
+                const newFavorites = new Set(prev);
+                newFavorites.delete(book);
+                return newFavorites;
+              });
+              console.log('Removed book favorite:', book);
+            }
           }
         }
       } else {
@@ -88,9 +101,13 @@ const BookSelector: React.FC<BookSelectorProps> = ({ books, onBookSelect, format
           })
         });
         
-        if (response.ok || response.status === 409) {
+        if (response.ok) {
+          setFavorites(prev => new Set(prev).add(book));
+          console.log('Added book favorite:', book);
+        } else if (response.status === 409) {
           // 409 means it already exists, which is fine - just update the UI
           setFavorites(prev => new Set(prev).add(book));
+          console.log('Book favorite already exists, updated UI:', book);
         } else {
           console.error('Failed to add favorite:', response.status, response.statusText);
         }

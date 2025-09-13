@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, BookOpen, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowLeft, BookOpen, ChevronLeft, ChevronRight, Star } from 'lucide-react';
 import { getChapter, getBook } from '../services/api';
 
 interface BibleReaderProps {
@@ -7,12 +7,14 @@ interface BibleReaderProps {
   chapter: string;
   onBack: () => void;
   formatBookName: (bookName: string) => string;
+  user?: any;
 }
 
-const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack, formatBookName }) => {
+const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack, formatBookName, user }) => {
   const [content, setContent] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [chapters, setChapters] = useState<string[]>([]);
+  const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [fontSize, setFontSize] = useState<'small' | 'medium' | 'large'>(() => {
     // Load font size preference from localStorage
     const saved = localStorage.getItem('fontSize');
@@ -23,6 +25,92 @@ const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack, format
     loadChapter();
     loadChapters();
   }, [book, chapter]);
+
+  // Load favorites when user is available
+  useEffect(() => {
+    if (user) {
+      loadFavorites();
+    }
+  }, [user, book, chapter]);
+
+  const loadFavorites = async () => {
+    if (!user) return;
+    
+    try {
+      const response = await fetch('/api/favorites', {
+        credentials: 'include'
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        const verseFavorites = new Set(
+          data.favorites
+            .filter((fav: any) => fav.book === book && fav.chapter === chapter && fav.verse_start) // Only verse-level favorites for this chapter
+            .map((fav: any) => fav.verse_end ? `${fav.verse_start}-${fav.verse_end}` : fav.verse_start.toString())
+        );
+        setFavorites(verseFavorites);
+      }
+    } catch (error) {
+      console.error('Failed to load favorites:', error);
+    }
+  };
+
+  const toggleFavorite = async (verseNumber: string) => {
+    if (!user) return;
+
+    const isFavorited = favorites.has(verseNumber);
+    
+    try {
+      if (isFavorited) {
+        // Remove favorite
+        const response = await fetch('/api/favorites', {
+          credentials: 'include'
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          const verseFavorite = data.favorites.find((fav: any) => 
+            fav.book === book && 
+            fav.chapter === chapter && 
+            fav.verse_start === parseInt(verseNumber)
+          );
+          
+          if (verseFavorite) {
+            await fetch(`/api/favorites/${verseFavorite.id}`, {
+              method: 'DELETE',
+              credentials: 'include'
+            });
+            
+            setFavorites(prev => {
+              const newFavorites = new Set(prev);
+              newFavorites.delete(verseNumber);
+              return newFavorites;
+            });
+          }
+        }
+      } else {
+        // Add favorite
+        const response = await fetch('/api/favorites', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            book: book,
+            chapter: chapter,
+            verse_start: parseInt(verseNumber)
+          })
+        });
+        
+        if (response.ok) {
+          setFavorites(prev => new Set(prev).add(verseNumber));
+        }
+      }
+    } catch (error) {
+      console.error('Failed to toggle favorite:', error);
+    }
+  };
 
   const loadChapters = async () => {
     try {
@@ -123,9 +211,27 @@ const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack, format
         const verseText = verseMatch[2];
 
         verses.push(
-          <div key={`verse-${verseNumber}`} className="mb-4">
-            <span className="verse-number">{verseNumber}</span>
-            <span className="bible-text">{verseText}</span>
+          <div key={`verse-${verseNumber}`} className="mb-4 flex items-start group">
+            {/* Star button - only show for authenticated users */}
+            {user && (
+              <button
+                onClick={() => toggleFavorite(verseNumber)}
+                className="mr-2 mt-1 p-1 opacity-0 group-hover:opacity-100 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-all"
+                title={favorites.has(verseNumber) ? 'Remove from favorites' : 'Add to favorites'}
+              >
+                <Star 
+                  className={`h-3 w-3 ${
+                    favorites.has(verseNumber) 
+                      ? 'text-yellow-500 fill-yellow-500' 
+                      : 'text-gray-400 hover:text-yellow-500'
+                  } transition-colors`}
+                />
+              </button>
+            )}
+            <div className="flex-1">
+              <span className="verse-number">{verseNumber}</span>
+              <span className="bible-text">{verseText}</span>
+            </div>
           </div>
         );
       } else if (line.startsWith('#')) {
@@ -213,6 +319,11 @@ const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack, format
         <h1 className="book-title">
           {formatBookName(book)} {chapter}
         </h1>
+        {user && (
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+            Hover over verses to see ★ and add them to your favorites
+          </p>
+        )}
       </div>
 
       {/* Bible Content */}

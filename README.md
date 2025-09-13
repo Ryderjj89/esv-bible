@@ -2,11 +2,31 @@
 
 A Docker-based web service for serving the ESV Bible in Markdown format with chapter-by-chapter organization.
 
+## Project Structure
+
+```
+esv-bible/
+├── backend/           # Backend API server
+│   ├── src/
+│   │   └── index.js   # Express server
+│   ├── package.json
+│   └── Dockerfile
+├── frontend/          # React frontend application
+│   ├── src/
+│   ├── public/
+│   ├── package.json
+│   └── ...
+├── bible-data/        # ESV Bible markdown files (auto-downloaded)
+├── docker-compose.yml
+└── README.md
+```
+
 ## Features
 
 - Complete ESV Bible text in Markdown format from [lguenth/mdbible](https://github.com/lguenth/mdbible)
 - Organized by book and chapter for easy navigation
 - Docker containerized for easy deployment
+- Modern React frontend with responsive design
 - RESTful API for accessing Bible content
 - Persistent volume storage for Bible data
 - Optimized for remote hosting
@@ -43,10 +63,18 @@ curl http://localhost:3000/books/Genesis/1
 
 ## Development
 
-For local development:
+### Backend Development
 ```bash
+cd backend
 npm install
 npm run dev
+```
+
+### Frontend Development
+```bash
+cd frontend
+npm install
+npm start
 ```
 
 ## Docker Deployment

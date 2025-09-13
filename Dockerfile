@@ -1,20 +1,42 @@
-FROM node:18-alpine
+# Multi-stage Dockerfile for production deployment
+FROM node:18-alpine AS base
 
-WORKDIR /app
-
-# Install git for cloning the bible repository
+# Install git for cloning bible repository
 RUN apk add --no-cache git
 
-# Copy package files
-COPY package*.json ./
-
-# Install dependencies
+# Backend stage
+FROM base AS backend
+WORKDIR /app/backend
+COPY backend/package*.json ./
 RUN npm ci --only=production
 
-# Copy application code
-COPY . .
+# Frontend build stage
+FROM base AS frontend-build
+WORKDIR /app/frontend
+COPY frontend/package*.json ./
+COPY frontend/tsconfig.json ./
+COPY frontend/tailwind.config.js ./
+COPY frontend/postcss.config.js ./
+RUN npm ci
+COPY frontend/public ./public
+COPY frontend/src ./src
+RUN npm run build
 
-# Clone ESV Bible markdown repository
+# Production stage
+FROM base AS production
+WORKDIR /app
+
+# Copy backend
+COPY backend ./backend
+COPY --from=backend /app/backend/node_modules ./backend/node_modules
+
+# Copy built frontend
+COPY --from=frontend-build /app/frontend/build ./frontend/build
+
+# Copy docker-compose configuration
+COPY docker-compose.yml ./
+
+# Clone ESV Bible repository
 RUN git clone https://github.com/lguenth/mdbible.git /tmp/mdbible && \
     mkdir -p /app/bible-data && \
     cp -r /tmp/mdbible/by_chapter/* /app/bible-data/ && \
@@ -23,5 +45,6 @@ RUN git clone https://github.com/lguenth/mdbible.git /tmp/mdbible && \
 # Expose port
 EXPOSE 3000
 
-# Start the application
+# Start backend server
+WORKDIR /app/backend
 CMD ["npm", "start"]

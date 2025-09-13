@@ -1,21 +1,26 @@
 {
-  "name": "esv-bible-markdown",
+  "name": "esv-bible-project",
   "version": "1.0.0",
-  "description": "ESV Bible in Markdown format served via Docker",
-  "main": "src/index.js",
+  "description": "ESV Bible application with React frontend and Node.js backend",
+  "main": "index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js"
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm start",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "build:frontend": "cd frontend && npm run build",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up",
+    "docker:down": "docker-compose down"
   },
-  "keywords": ["bible", "esv", "markdown", "docker"],
+  "keywords": ["bible", "esv", "react", "docker", "markdown"],
   "author": "",
   "license": "MIT",
-  "dependencies": {
-    "express": "^4.18.2",
-    "cors": "^2.8.5",
-    "helmet": "^7.1.0"
-  },
   "devDependencies": {
-    "nodemon": "^3.0.1"
-  }
+    "concurrently": "^8.2.0"
+  },
+  "workspaces": [
+    "backend",
+    "frontend"
+  ]
 }

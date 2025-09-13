@@ -5,11 +5,11 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - bible_data:/app/bible-data
+      - data:/app/bible-data
     environment:
       - NODE_ENV=production
     restart: unless-stopped
 
 volumes:
-  bible_data:
+  data:
     driver: local

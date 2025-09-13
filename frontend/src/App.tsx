@@ -4,6 +4,7 @@ import { Book, ChevronRight, Moon, Sun } from 'lucide-react';
 import BookSelector from './components/BookSelector';
 import ChapterSelector from './components/ChapterSelector';
 import BibleReader from './components/BibleReader';
+import FavoritesMenu from './components/FavoritesMenu';
 import { getBooks } from './services/api';
 
 interface BookData {
@@ -223,7 +224,7 @@ function App() {
   // Helper function to convert display name back to file name
   const getBookFileName = (displayName: string): string => {
     // Find the book that matches the display name
-    const book = books.find(b => formatBookName(b) === displayName);
+    const book = books.find((b: string) => formatBookName(b) === displayName);
     return book || displayName;
   };
 
@@ -352,8 +353,15 @@ function App() {
               )}
             </div>
 
-            {/* User Authentication & Dark Mode */}
+            {/* User Authentication, Favorites & Dark Mode */}
             <div className="flex items-center space-x-2">
+              {/* Favorites Menu - Only for authenticated users */}
+              <FavoritesMenu 
+                user={user}
+                formatBookName={formatBookName}
+                getBookUrlName={getBookUrlName}
+              />
+
               {/* Authentication Button */}
               {authAvailable && (
                 <div className="hidden sm:block">

@@ -13,10 +13,10 @@ app.use(cors());
 app.use(express.json());
 
 // Serve static files from the React build
-app.use(express.static(path.join(__dirname, '../frontend/build')));
+app.use(express.static(path.join(__dirname, '../../frontend/build')));
 
 // Bible data directory
-const BIBLE_DATA_DIR = path.join(__dirname, '../bible-data');
+const BIBLE_DATA_DIR = path.join(__dirname, '../../bible-data');
 
 // Helper function to read markdown files
 async function readMarkdownFile(filePath) {
@@ -119,7 +119,7 @@ app.get('/books/:book/:chapter', async (req, res) => {
 
 // Catch-all handler: send back React's index.html for client-side routing
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/build/index.html'));
+  res.sendFile(path.join(__dirname, '../../frontend/build/index.html'));
 });
 
 // Error handling middleware

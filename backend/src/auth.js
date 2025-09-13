@@ -102,7 +102,7 @@ function configureAuth(app) {
         return done(err);
       }
       console.log('User from database:', user);
-      return done(null, user);
+      done(null, user);
     });
   }));
 

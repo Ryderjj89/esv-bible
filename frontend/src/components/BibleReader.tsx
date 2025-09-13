@@ -43,11 +43,11 @@ const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack, format
       
       if (response.ok) {
         const data = await response.json();
-        const verseFavorites = new Set(
-          data.favorites
-            .filter((fav: any) => fav.book === book && fav.chapter === chapter && fav.verse_start) // Only verse-level favorites for this chapter
-            .map((fav: any) => fav.verse_end ? `${fav.verse_start}-${fav.verse_end}` : fav.verse_start.toString())
-        );
+        const favoriteStrings: string[] = data.favorites
+          .filter((fav: any) => fav.book === book && fav.chapter === chapter && fav.verse_start) // Only verse-level favorites for this chapter
+          .map((fav: any) => fav.verse_end ? `${fav.verse_start}-${fav.verse_end}` : fav.verse_start.toString());
+        
+        const verseFavorites = new Set<string>(favoriteStrings);
         setFavorites(verseFavorites);
       }
     } catch (error) {
@@ -124,7 +124,7 @@ const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack, format
   };
 
   const getCurrentChapterIndex = () => {
-    return chapters.findIndex(ch => ch === chapter);
+    return chapters.findIndex((ch: string) => ch === chapter);
   };
 
   const getPreviousChapter = () => {

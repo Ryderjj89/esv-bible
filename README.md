@@ -34,8 +34,8 @@ esv-bible/
 ## Setup
 
 1. Clone this repository
-2. The ESV Bible data will be automatically downloaded during Docker build from the GitHub repository
-3. Run `docker-compose up --build`
+2. Run `docker-compose up` (uses pre-built image from Docker Hub)
+3. The ESV Bible data is included in the Docker image
 
 ## Usage
 
@@ -79,12 +79,12 @@ npm start
 
 ## Docker Deployment
 
-Build and run with Docker Compose:
+Run with Docker Compose using pre-built Docker Hub image:
 ```bash
-docker-compose up --build
+docker-compose up
 ```
 
-The Bible data is stored in a persistent Docker volume named `bible_data` for efficient storage and updates.
+The application uses the `ryderjj89/esv-bible:latest` image from Docker Hub. The Bible data is included in the Docker image and stored in a persistent Docker volume named `bible_data` for efficient storage and updates.
 
 ## Data Source
 

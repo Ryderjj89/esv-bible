@@ -1,6 +1,7 @@
 services:
   esv-bible:
-    build: .
+    image: ryderjj89/esv-bible:latest
+    container_name: esv-bible
     ports:
       - "3000:3000"
     volumes:

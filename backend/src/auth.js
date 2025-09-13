@@ -79,31 +79,17 @@ function configureAuth(app) {
     scope: 'openid email profile',
     skipUserProfile: false
   }, (issuer, sub, profile, accessToken, refreshToken, done) => {
-    console.log('OIDC Strategy callback - All parameters:');
-    console.log('Parameter 1 (issuer):', typeof issuer, issuer);
-    console.log('Parameter 2 (sub):', typeof sub, sub);
-    console.log('Parameter 3 (profile):', typeof profile, profile);
-    console.log('Parameter 4 (accessToken):', typeof accessToken, accessToken);
-    console.log('Parameter 5 (refreshToken):', typeof refreshToken, refreshToken);
-    console.log('Parameter 6 (done):', typeof done, done);
+    console.log('OIDC Strategy callback:');
+    console.log('Issuer:', issuer);
+    console.log('Profile data (sub):', sub);
     
-    // Find the actual callback function - it might be in a different position
-    const args = Array.from(arguments);
-    console.log('All arguments:', args.map((arg, i) => `${i}: ${typeof arg}`));
+    // Based on debugging: profile is actually the callback function
+    const callback = profile;
+    console.log('Using profile parameter as callback:', typeof callback);
     
-    const callback = args.find(arg => typeof arg === 'function');
-    console.log('Found callback function:', typeof callback);
-    
-    if (!callback) {
-      console.error('No callback function found in arguments!');
-      return;
-    }
-    
-    // Extract user info from profile - sub is actually the profile object in this case
-    console.log('Raw profile object:', JSON.stringify(sub, null, 2));
-    
+    // Extract user info from sub parameter (which contains the actual profile data)
     const userProfile = {
-      sub: sub.id, // Extract the actual ID from the sub object
+      sub: sub.id,
       email: sub.emails?.[0]?.value,
       name: sub.displayName || sub.name?.givenName || sub.username
     };

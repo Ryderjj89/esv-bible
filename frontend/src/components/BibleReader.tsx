@@ -49,6 +49,7 @@ const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack, format
         
         const verseFavorites = new Set<string>(favoriteStrings);
         setFavorites(verseFavorites);
+        console.log('Loaded verse favorites:', favoriteStrings);
       }
     } catch (error) {
       console.error('Failed to load favorites:', error);
@@ -76,16 +77,19 @@ const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack, format
           );
           
           if (verseFavorite) {
-            await fetch(`/api/favorites/${verseFavorite.id}`, {
+            const deleteResponse = await fetch(`/api/favorites/${verseFavorite.id}`, {
               method: 'DELETE',
               credentials: 'include'
             });
             
-            setFavorites(prev => {
-              const newFavorites = new Set(prev);
-              newFavorites.delete(verseNumber);
-              return newFavorites;
-            });
+            if (deleteResponse.ok) {
+              setFavorites(prev => {
+                const newFavorites = new Set(prev);
+                newFavorites.delete(verseNumber);
+                return newFavorites;
+              });
+              console.log('Removed verse favorite:', verseNumber);
+            }
           }
         }
       } else {
@@ -105,6 +109,11 @@ const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack, format
         
         if (response.ok) {
           setFavorites(prev => new Set(prev).add(verseNumber));
+          console.log('Added verse favorite:', verseNumber);
+        } else if (response.status === 409) {
+          // 409 means it already exists, which is fine - just update the UI
+          setFavorites(prev => new Set(prev).add(verseNumber));
+          console.log('Verse favorite already exists, updated UI:', verseNumber);
         }
       }
     } catch (error) {
@@ -211,12 +220,16 @@ const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack, format
         const verseText = verseMatch[2];
 
         verses.push(
-          <div key={`verse-${verseNumber}`} className="mb-4 flex items-start group">
+          <div key={`verse-${verseNumber}`} className="mb-4 flex items-start hover:bg-gray-50 dark:hover:bg-gray-800 p-2 rounded transition-colors group">
             {/* Star button - only show for authenticated users */}
             {user && (
               <button
                 onClick={() => toggleFavorite(verseNumber)}
-                className="mr-2 mt-1 p-1 opacity-0 group-hover:opacity-100 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-all"
+                className={`mr-2 mt-1 p-1 rounded transition-all ${
+                  favorites.has(verseNumber) 
+                    ? 'opacity-100' 
+                    : 'opacity-30 hover:opacity-100 group-hover:opacity-100'
+                } hover:bg-gray-200 dark:hover:bg-gray-600`}
                 title={favorites.has(verseNumber) ? 'Remove from favorites' : 'Add to favorites'}
               >
                 <Star 
@@ -229,7 +242,7 @@ const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack, format
               </button>
             )}
             <div className="flex-1">
-              <span className="verse-number">{verseNumber}</span>
+              <span className="verse-number font-semibold text-blue-600 dark:text-blue-400 mr-2">{verseNumber}</span>
               <span className="bible-text">{verseText}</span>
             </div>
           </div>
@@ -238,14 +251,14 @@ const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack, format
         // Chapter header
         const headerText = line.replace(/^#+\s*/, '');
         verses.push(
-          <h2 key={`header-${i}`} className="chapter-title">
+          <h2 key={`header-${i}`} className="chapter-title text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6 mt-8">
             {headerText}
           </h2>
         );
       } else {
         // Regular text (continuation of previous verse or other content)
         verses.push(
-          <p key={`text-${i}`} className="bible-text mb-4">
+          <p key={`text-${i}`} className="bible-text mb-4 text-gray-700 dark:text-gray-300">
             {line}
           </p>
         );
@@ -316,7 +329,7 @@ const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack, format
 
       {/* Chapter Title */}
       <div className="text-center mb-8">
-        <h1 className="book-title">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
           {formatBookName(book)} {chapter}
         </h1>
         {user && (

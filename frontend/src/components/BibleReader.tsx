@@ -41,11 +41,11 @@ const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack, format
   const getFontSizeClass = () => {
     switch (fontSize) {
       case 'small':
-        return 'text-base';
+        return 'text-sm leading-relaxed';
       case 'large':
-        return 'text-xl';
+        return 'text-2xl leading-relaxed';
       default:
-        return 'text-lg';
+        return 'text-lg leading-relaxed';
     }
   };
 
@@ -142,7 +142,7 @@ const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack, format
       </div>
 
       {/* Bible Content */}
-      <div className={`max-w-3xl mx-auto leading-relaxed ${getFontSizeClass()}`}>
+      <div className={`max-w-3xl mx-auto ${getFontSizeClass()}`}>
         {parseBibleText(content)}
       </div>
 

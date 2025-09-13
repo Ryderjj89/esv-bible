@@ -7,7 +7,8 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        serif: ['Georgia', 'Times New Roman', 'serif'],
+        serif: ['Times New Roman', 'Georgia', 'serif'],
+        sans: ['Times New Roman', 'Georgia', 'serif'],
       },
       typography: {
         DEFAULT: {

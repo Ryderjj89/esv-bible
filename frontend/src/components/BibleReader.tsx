@@ -12,11 +12,25 @@ interface BibleReaderProps {
 const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack, formatBookName }) => {
   const [content, setContent] = useState<string>('');
   const [loading, setLoading] = useState(true);
-  const [fontSize, setFontSize] = useState<'small' | 'medium' | 'large'>('medium');
+  const [fontSize, setFontSize] = useState<'small' | 'medium' | 'large'>(() => {
+    // Load font size preference from localStorage
+    const saved = localStorage.getItem('fontSize');
+    return (saved as 'small' | 'medium' | 'large') || 'medium';
+  });
 
   useEffect(() => {
     loadChapter();
   }, [book, chapter]);
+
+  useEffect(() => {
+    // Save font size preference to localStorage
+    localStorage.setItem('fontSize', fontSize);
+  }, [fontSize]);
+
+  const handleFontSizeChange = (newSize: 'small' | 'medium' | 'large') => {
+    console.log(`Changing font size from ${fontSize} to ${newSize}`);
+    setFontSize(newSize);
+  };
 
   const loadChapter = async () => {
     try {
@@ -118,7 +132,7 @@ const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack, format
           <span className="text-sm text-gray-600 dark:text-gray-400">Font Size:</span>
           <div className="flex space-x-1">
             <button
-              onClick={() => setFontSize('small')}
+              onClick={() => handleFontSizeChange('small')}
               className={`px-3 py-1 text-xs rounded ${
                 fontSize === 'small'
                   ? 'bg-blue-600 text-white'
@@ -128,7 +142,7 @@ const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack, format
               Small
             </button>
             <button
-              onClick={() => setFontSize('medium')}
+              onClick={() => handleFontSizeChange('medium')}
               className={`px-3 py-1 text-xs rounded ${
                 fontSize === 'medium'
                   ? 'bg-blue-600 text-white'
@@ -138,7 +152,7 @@ const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack, format
               Medium
             </button>
             <button
-              onClick={() => setFontSize('large')}
+              onClick={() => handleFontSizeChange('large')}
               className={`px-3 py-1 text-xs rounded ${
                 fontSize === 'large'
                   ? 'bg-blue-600 text-white'

@@ -11,20 +11,23 @@ interface BookData {
 }
 
 // Component for the home page
-function HomePage({ books, formatBookName }: { books: string[], formatBookName: (name: string) => string }) {
+function HomePage({ books, formatBookName, getBookUrlName }: { books: string[], formatBookName: (name: string) => string, getBookUrlName: (name: string) => string }) {
   const navigate = useNavigate();
   
   const handleBookSelect = (book: string) => {
-    navigate(`/book/${book}`);
+    const urlName = getBookUrlName(book);
+    navigate(`/book/${urlName}`);
   };
 
   return <BookSelector books={books} onBookSelect={handleBookSelect} formatBookName={formatBookName} />;
 }
 
 // Component for book chapters page
-function BookPage({ books, formatBookName }: { books: string[], formatBookName: (name: string) => string }) {
+function BookPage({ books, formatBookName, getBookFromUrl }: { books: string[], formatBookName: (name: string) => string, getBookFromUrl: (urlName: string) => string }) {
   const { bookName } = useParams<{ bookName: string }>();
   const navigate = useNavigate();
+
+  const actualBookName = bookName ? getBookFromUrl(bookName) : '';
 
   const handleChapterSelect = (chapter: string) => {
     navigate(`/book/${bookName}/chapter/${chapter}`);
@@ -34,13 +37,13 @@ function BookPage({ books, formatBookName }: { books: string[], formatBookName: 
     navigate('/');
   };
 
-  if (!bookName || !books.includes(bookName)) {
+  if (!bookName || !actualBookName || !books.includes(actualBookName)) {
     return <div>Book not found</div>;
   }
 
   return (
     <ChapterSelector
-      book={bookName}
+      book={actualBookName}
       onChapterSelect={handleChapterSelect}
       onBack={handleBack}
       formatBookName={formatBookName}
@@ -49,21 +52,23 @@ function BookPage({ books, formatBookName }: { books: string[], formatBookName: 
 }
 
 // Component for chapter reading page
-function ChapterPage({ formatBookName }: { formatBookName: (name: string) => string }) {
+function ChapterPage({ formatBookName, getBookFromUrl }: { formatBookName: (name: string) => string, getBookFromUrl: (urlName: string) => string }) {
   const { bookName, chapterNumber } = useParams<{ bookName: string, chapterNumber: string }>();
   const navigate = useNavigate();
+
+  const actualBookName = bookName ? getBookFromUrl(bookName) : '';
 
   const handleBack = () => {
     navigate(`/book/${bookName}`);
   };
 
-  if (!bookName || !chapterNumber) {
+  if (!bookName || !chapterNumber || !actualBookName) {
     return <div>Chapter not found</div>;
   }
 
   return (
     <BibleReader
-      book={bookName}
+      book={actualBookName}
       chapter={chapterNumber}
       onBack={handleBack}
       formatBookName={formatBookName}
@@ -105,6 +110,26 @@ function App() {
   const formatBookName = (bookName: string): string => {
     // Remove leading numbers and underscores, replace underscores with spaces
     return bookName.replace(/^\d+_/, '').replace(/_/g, ' ');
+  };
+
+  // Helper function to convert display name back to file name
+  const getBookFileName = (displayName: string): string => {
+    // Find the book that matches the display name
+    const book = books.find(b => formatBookName(b) === displayName);
+    return book || displayName;
+  };
+
+  // Helper function to convert book file name to URL-safe name
+  const getBookUrlName = (bookName: string): string => {
+    // Remove leading numbers and convert spaces to underscores for URL
+    return bookName.replace(/^\d+_/, '').replace(/ /g, '_');
+  };
+
+  // Helper function to convert URL name back to file name
+  const getBookFromUrl = (urlName: string): string => {
+    // Convert URL name back to display name, then find the file name
+    const displayName = urlName.replace(/_/g, ' ');
+    return getBookFileName(displayName);
   };
 
   const loadBooks = async () => {
@@ -218,9 +243,9 @@ function App() {
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Routes>
-          <Route path="/" element={<HomePage books={books} formatBookName={formatBookName} />} />
-          <Route path="/book/:bookName" element={<BookPage books={books} formatBookName={formatBookName} />} />
-          <Route path="/book/:bookName/chapter/:chapterNumber" element={<ChapterPage formatBookName={formatBookName} />} />
+          <Route path="/" element={<HomePage books={books} formatBookName={formatBookName} getBookUrlName={getBookUrlName} />} />
+          <Route path="/book/:bookName" element={<BookPage books={books} formatBookName={formatBookName} getBookFromUrl={getBookFromUrl} />} />
+          <Route path="/book/:bookName/chapter/:chapterNumber" element={<ChapterPage formatBookName={formatBookName} getBookFromUrl={getBookFromUrl} />} />
         </Routes>
       </main>
     </div>

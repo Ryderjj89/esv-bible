@@ -15,8 +15,13 @@ function App() {
   const [selectedChapter, setSelectedChapter] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
+  const [error, setError] = useState<string>('');
+
+  // Debug logging
+  console.log('App component rendered');
 
   useEffect(() => {
+    console.log('App useEffect triggered');
     loadBooks();
   }, []);
 
@@ -30,10 +35,13 @@ function App() {
 
   const loadBooks = async () => {
     try {
+      console.log('Loading books from API...');
       const data: BookData = await getBooks();
+      console.log('Books loaded:', data);
       setBooks(data.books);
     } catch (error) {
       console.error('Failed to load books:', error);
+      setError('Failed to load books. Please check the console for details.');
     } finally {
       setLoading(false);
     }

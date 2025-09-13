@@ -58,6 +58,15 @@ function configureAuth(app) {
   app.use(passport.initialize());
   app.use(passport.session());
 
+  // Log OIDC configuration for debugging
+  console.log('OIDC Configuration:');
+  console.log('Issuer:', process.env.OIDC_ISSUER);
+  console.log('Auth URL:', process.env.OIDC_AUTH_URL);
+  console.log('Token URL:', process.env.OIDC_TOKEN_URL);
+  console.log('UserInfo URL:', process.env.OIDC_USERINFO_URL);
+  console.log('Client ID:', process.env.OIDC_CLIENT_ID);
+  console.log('Callback URL:', process.env.OIDC_CALLBACK_URL || '/auth/callback');
+
   // Configure OpenID Connect strategy
   passport.use('oidc', new OpenIDConnectStrategy({
     issuer: process.env.OIDC_ISSUER,
@@ -67,7 +76,8 @@ function configureAuth(app) {
     clientID: process.env.OIDC_CLIENT_ID,
     clientSecret: process.env.OIDC_CLIENT_SECRET,
     callbackURL: process.env.OIDC_CALLBACK_URL || '/auth/callback',
-    scope: 'openid email profile'
+    scope: 'openid email profile',
+    skipUserProfile: false
   }, (issuer, sub, profile, accessToken, refreshToken, done) => {
     console.log('OIDC Strategy callback:');
     console.log('Issuer:', issuer);

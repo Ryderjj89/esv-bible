@@ -55,11 +55,11 @@ const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack, format
   const getFontSizeClass = () => {
     switch (fontSize) {
       case 'small':
-        return 'text-sm leading-relaxed';
+        return 'font-size-small';
       case 'large':
-        return 'text-2xl leading-relaxed';
+        return 'font-size-large';
       default:
-        return 'text-lg leading-relaxed';
+        return 'font-size-medium';
     }
   };
 

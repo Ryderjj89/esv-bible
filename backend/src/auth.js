@@ -69,6 +69,12 @@ function configureAuth(app) {
     callbackURL: process.env.OIDC_CALLBACK_URL || '/auth/callback',
     scope: 'openid email profile'
   }, (issuer, sub, profile, accessToken, refreshToken, done) => {
+    console.log('OIDC Strategy callback:');
+    console.log('Issuer:', issuer);
+    console.log('Subject:', sub);
+    console.log('Profile:', profile);
+    console.log('Access Token:', accessToken ? 'Present' : 'Missing');
+    
     // Extract user info from profile
     const userProfile = {
       sub: profile.id,
@@ -76,10 +82,14 @@ function configureAuth(app) {
       name: profile.displayName
     };
 
+    console.log('Extracted user profile:', userProfile);
+
     userOps.findOrCreateUser(userProfile, (err, user) => {
       if (err) {
+        console.error('Database error in findOrCreateUser:', err);
         return done(err);
       }
+      console.log('User from database:', user);
       return done(null, user);
     });
   }));
@@ -99,13 +109,38 @@ function configureAuth(app) {
   // Auth routes
   app.get('/auth/login', passport.authenticate('oidc'));
 
-  app.get('/auth/callback',
-    passport.authenticate('oidc', { failureRedirect: '/login' }),
-    (req, res) => {
-      // Successful authentication, redirect to frontend
-      res.redirect(process.env.FRONTEND_URL || '/');
-    }
-  );
+  app.get('/auth/callback', (req, res, next) => {
+    console.log('Auth callback received');
+    console.log('Query params:', req.query);
+    console.log('Body:', req.body);
+    
+    passport.authenticate('oidc', (err, user, info) => {
+      console.log('Passport authenticate callback:');
+      console.log('Error:', err);
+      console.log('User:', user);
+      console.log('Info:', info);
+      
+      if (err) {
+        console.error('Authentication error:', err);
+        return res.redirect('/?error=auth_failed');
+      }
+      
+      if (!user) {
+        console.error('No user returned from authentication');
+        return res.redirect('/?error=no_user');
+      }
+      
+      req.logIn(user, (err) => {
+        if (err) {
+          console.error('Login error:', err);
+          return res.redirect('/?error=login_failed');
+        }
+        
+        console.log('User successfully logged in:', user);
+        res.redirect('/');
+      });
+    })(req, res, next);
+  });
 
   app.post('/auth/logout', (req, res) => {
     req.logout((err) => {

@@ -47,8 +47,10 @@ function configureAuth(app) {
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+      secure: false, // Set to false for development/HTTP
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      sameSite: 'lax'
     }
   }));
 
@@ -121,6 +123,11 @@ function configureAuth(app) {
 
   // Get current user
   app.get('/auth/user', (req, res) => {
+    console.log('Auth check - Session ID:', req.sessionID);
+    console.log('Auth check - Is authenticated:', req.isAuthenticated());
+    console.log('Auth check - User:', req.user);
+    console.log('Auth check - Session:', req.session);
+    
     if (req.isAuthenticated()) {
       res.json({
         user: {

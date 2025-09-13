@@ -1,0 +1,21 @@
+{
+  "name": "esv-bible-markdown",
+  "version": "1.0.0",
+  "description": "ESV Bible in Markdown format served via Docker",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "keywords": ["bible", "esv", "markdown", "docker"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

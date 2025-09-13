@@ -225,11 +225,7 @@ const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack, format
             {user && (
               <button
                 onClick={() => toggleFavorite(verseNumber)}
-                className={`mr-2 mt-1 p-1 rounded transition-all ${
-                  favorites.has(verseNumber) 
-                    ? 'opacity-100' 
-                    : 'opacity-30 hover:opacity-100 group-hover:opacity-100'
-                } hover:bg-gray-200 dark:hover:bg-gray-600`}
+                className="mr-2 mt-1 p-1 rounded transition-all opacity-60 hover:opacity-100 hover:bg-gray-200 dark:hover:bg-gray-600"
                 title={favorites.has(verseNumber) ? 'Remove from favorites' : 'Add to favorites'}
               >
                 <Star 

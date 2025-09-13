@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Star, ChevronDown, ChevronUp, X } from 'lucide-react';
+import { Star, ChevronDown, ChevronUp, X, Book, FileText, Quote } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface Favorite {
@@ -93,6 +93,55 @@ const FavoritesMenu: React.FC<FavoritesMenuProps> = ({ user, formatBookName, get
     }
   };
 
+  // Organize favorites by type
+  const organizedFavorites = {
+    books: favorites.filter(f => !f.chapter),
+    chapters: favorites.filter(f => f.chapter && !f.verse_start),
+    verses: favorites.filter(f => f.verse_start)
+  };
+
+  const renderFavoriteSection = (title: string, items: Favorite[], icon: React.ReactNode) => {
+    if (items.length === 0) return null;
+
+    return (
+      <div className="mb-2">
+        <div className="flex items-center space-x-2 px-3 py-2 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+          {icon}
+          <span className="text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wide">
+            {title} ({items.length})
+          </span>
+        </div>
+        {items.map((favorite) => (
+          <div
+            key={favorite.id}
+            className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 group"
+          >
+            <button
+              onClick={() => navigateToFavorite(favorite)}
+              className="flex-1 text-left"
+            >
+              <div className="font-medium text-gray-900 dark:text-gray-100 text-sm">
+                {getFavoriteDisplayText(favorite)}
+              </div>
+              {favorite.note && (
+                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">
+                  {favorite.note}
+                </div>
+              )}
+            </button>
+            <button
+              onClick={() => removeFavorite(favorite.id)}
+              className="p-1 opacity-0 group-hover:opacity-100 hover:bg-red-100 dark:hover:bg-red-900 rounded transition-opacity"
+              title="Remove favorite"
+            >
+              <X className="h-3 w-3 text-red-500" />
+            </button>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   if (!user) {
     return null; // Don't show favorites menu for non-authenticated users
   }
@@ -140,34 +189,22 @@ const FavoritesMenu: React.FC<FavoritesMenuProps> = ({ user, formatBookName, get
                 <p className="text-sm">Click the ★ next to books, chapters, or verses to add them here</p>
               </div>
             ) : (
-              <div className="py-2">
-                {favorites.map((favorite) => (
-                  <div
-                    key={favorite.id}
-                    className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 group"
-                  >
-                    <button
-                      onClick={() => navigateToFavorite(favorite)}
-                      className="flex-1 text-left"
-                    >
-                      <div className="font-medium text-gray-900 dark:text-gray-100 text-sm">
-                        {getFavoriteDisplayText(favorite)}
-                      </div>
-                      {favorite.note && (
-                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">
-                          {favorite.note}
-                        </div>
-                      )}
-                    </button>
-                    <button
-                      onClick={() => removeFavorite(favorite.id)}
-                      className="p-1 opacity-0 group-hover:opacity-100 hover:bg-red-100 dark:hover:bg-red-900 rounded transition-opacity"
-                      title="Remove favorite"
-                    >
-                      <X className="h-3 w-3 text-red-500" />
-                    </button>
-                  </div>
-                ))}
+              <div className="py-1">
+                {renderFavoriteSection(
+                  "Books", 
+                  organizedFavorites.books, 
+                  <Book className="h-3 w-3 text-blue-600 dark:text-blue-400" />
+                )}
+                {renderFavoriteSection(
+                  "Chapters", 
+                  organizedFavorites.chapters, 
+                  <FileText className="h-3 w-3 text-green-600 dark:text-green-400" />
+                )}
+                {renderFavoriteSection(
+                  "Verses", 
+                  organizedFavorites.verses, 
+                  <Quote className="h-3 w-3 text-purple-600 dark:text-purple-400" />
+                )}
               </div>
             )}
           </div>

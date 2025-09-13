@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, BookOpen } from 'lucide-react';
-import { getChapter } from '../services/api';
+import { ArrowLeft, BookOpen, ChevronLeft, ChevronRight } from 'lucide-react';
+import { getChapter, getBook } from '../services/api';
 
 interface BibleReaderProps {
   book: string;
@@ -12,6 +12,7 @@ interface BibleReaderProps {
 const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack, formatBookName }) => {
   const [content, setContent] = useState<string>('');
   const [loading, setLoading] = useState(true);
+  const [chapters, setChapters] = useState<string[]>([]);
   const [fontSize, setFontSize] = useState<'small' | 'medium' | 'large'>(() => {
     // Load font size preference from localStorage
     const saved = localStorage.getItem('fontSize');
@@ -20,7 +21,49 @@ const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack, format
 
   useEffect(() => {
     loadChapter();
+    loadChapters();
   }, [book, chapter]);
+
+  const loadChapters = async () => {
+    try {
+      const response = await getBook(book);
+      if (response.chapters) {
+        setChapters(response.chapters);
+      }
+    } catch (error) {
+      console.error('Failed to load chapters:', error);
+    }
+  };
+
+  const getCurrentChapterIndex = () => {
+    return chapters.findIndex(ch => ch === chapter);
+  };
+
+  const getPreviousChapter = () => {
+    const currentIndex = getCurrentChapterIndex();
+    return currentIndex > 0 ? chapters[currentIndex - 1] : null;
+  };
+
+  const getNextChapter = () => {
+    const currentIndex = getCurrentChapterIndex();
+    return currentIndex < chapters.length - 1 ? chapters[currentIndex + 1] : null;
+  };
+
+  const handlePreviousChapter = () => {
+    const prevChapter = getPreviousChapter();
+    if (prevChapter) {
+      // Navigate to previous chapter - this would need to be passed from parent
+      window.location.href = window.location.href.replace(`/chapter/${chapter}`, `/chapter/${prevChapter}`);
+    }
+  };
+
+  const handleNextChapter = () => {
+    const nextChapter = getNextChapter();
+    if (nextChapter) {
+      // Navigate to next chapter - this would need to be passed from parent
+      window.location.href = window.location.href.replace(`/chapter/${chapter}`, `/chapter/${nextChapter}`);
+    }
+  };
 
   useEffect(() => {
     // Save font size preference to localStorage
@@ -178,13 +221,36 @@ const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack, format
       </div>
 
       {/* Footer Navigation */}
-      <div className="flex justify-center mt-12 space-x-4">
+      <div className="flex justify-center items-center mt-12 space-x-4">
+        {/* Previous Chapter Button */}
+        {getPreviousChapter() && (
+          <button
+            onClick={handlePreviousChapter}
+            className="flex items-center space-x-2 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            <span>Previous</span>
+          </button>
+        )}
+
+        {/* Back to Chapters Button */}
         <button
           onClick={onBack}
           className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
         >
           Back to Chapters
         </button>
+
+        {/* Next Chapter Button */}
+        {getNextChapter() && (
+          <button
+            onClick={handleNextChapter}
+            className="flex items-center space-x-2 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+          >
+            <span>Next</span>
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        )}
       </div>
     </div>
   );

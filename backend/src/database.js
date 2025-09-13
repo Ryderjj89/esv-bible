@@ -56,7 +56,7 @@ function initializeTables() {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       user_id INTEGER NOT NULL,
       book TEXT NOT NULL,
-      chapter TEXT NOT NULL,
+      chapter TEXT,
       verse_start INTEGER,
       verse_end INTEGER,
       note TEXT,

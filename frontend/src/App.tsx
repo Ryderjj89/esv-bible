@@ -267,6 +267,11 @@ function App() {
       navigate(`/book/${bookName}`);
     };
 
+    const handleFavoriteChange = () => {
+      // This will trigger a re-render of the FavoritesMenu
+      setUser(prev => ({ ...prev }));
+    };
+
     if (!bookName || !chapterNumber || !actualBookName) {
       return <div>Chapter not found</div>;
     }
@@ -278,6 +283,7 @@ function App() {
         onBack={handleBack}
         formatBookName={formatBookName}
         user={user}
+        onFavoriteChange={handleFavoriteChange}
       />
     );
   };

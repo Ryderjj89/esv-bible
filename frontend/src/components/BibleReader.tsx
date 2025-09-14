@@ -8,9 +8,10 @@ interface BibleReaderProps {
   onBack: () => void;
   formatBookName: (bookName: string) => string;
   user?: any;
+  onFavoriteChange?: () => void;
 }
 
-const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack, formatBookName, user }) => {
+const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack, formatBookName, user, onFavoriteChange }) => {
   const [content, setContent] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [chapters, setChapters] = useState<string[]>([]);
@@ -89,6 +90,7 @@ const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack, format
                 return newFavorites;
               });
               console.log('Removed verse favorite:', verseNumber);
+              onFavoriteChange?.(); // Notify parent to refresh favorites menu
             }
           }
         }
@@ -110,10 +112,12 @@ const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack, format
         if (response.ok) {
           setFavorites(prev => new Set(prev).add(verseNumber));
           console.log('Added verse favorite:', verseNumber);
+          onFavoriteChange?.(); // Notify parent to refresh favorites menu
         } else if (response.status === 409) {
           // 409 means it already exists, which is fine - just update the UI
           setFavorites(prev => new Set(prev).add(verseNumber));
           console.log('Verse favorite already exists, updated UI:', verseNumber);
+          onFavoriteChange?.(); // Notify parent to refresh favorites menu
         }
       }
     } catch (error) {
@@ -276,48 +280,53 @@ const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack, format
   return (
     <div>
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 space-y-4 sm:space-y-0">
         <button
           onClick={onBack}
           className="flex items-center space-x-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
         >
           <ArrowLeft className="h-5 w-5" />
-          <span>Back to Chapters</span>
+          <span className="hidden sm:inline">Back to Chapters</span>
+          <span className="sm:hidden">Back</span>
         </button>
 
         {/* Font Size Controls */}
         <div className="flex items-center space-x-2">
-          <span className="text-sm text-gray-600 dark:text-gray-400">Font Size:</span>
+          <span className="hidden sm:inline text-sm text-gray-600 dark:text-gray-400">Font Size:</span>
+          <span className="sm:hidden text-xs text-gray-600 dark:text-gray-400">Size:</span>
           <div className="flex space-x-1">
             <button
               onClick={() => handleFontSizeChange('small')}
-              className={`px-3 py-1 text-xs rounded ${
+              className={`px-2 sm:px-3 py-1 text-xs rounded ${
                 fontSize === 'small'
                   ? 'bg-blue-600 text-white'
                   : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
               } transition-colors`}
             >
-              Small
+              <span className="hidden sm:inline">Small</span>
+              <span className="sm:hidden">S</span>
             </button>
             <button
               onClick={() => handleFontSizeChange('medium')}
-              className={`px-3 py-1 text-xs rounded ${
+              className={`px-2 sm:px-3 py-1 text-xs rounded ${
                 fontSize === 'medium'
                   ? 'bg-blue-600 text-white'
                   : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
               } transition-colors`}
             >
-              Medium
+              <span className="hidden sm:inline">Medium</span>
+              <span className="sm:hidden">M</span>
             </button>
             <button
               onClick={() => handleFontSizeChange('large')}
-              className={`px-3 py-1 text-xs rounded ${
+              className={`px-2 sm:px-3 py-1 text-xs rounded ${
                 fontSize === 'large'
                   ? 'bg-blue-600 text-white'
                   : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
               } transition-colors`}
             >
-              Large
+              <span className="hidden sm:inline">Large</span>
+              <span className="sm:hidden">L</span>
             </button>
           </div>
         </div>

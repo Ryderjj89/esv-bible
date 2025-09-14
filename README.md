@@ -41,6 +41,18 @@ A Docker-based ESV Bible application with markdown content, featuring a React fr
 
 ### Basic Setup (No Authentication)
 
+#### Option 1: Use Pre-built Docker Image (Recommended)
+
+1. **Run directly from Docker Hub**
+   ```bash
+   docker run -d -p 3000:3000 -v esv-bible-data:/app/backend/data --name esv-bible ryderjj89/esv-bible:latest
+   ```
+
+2. **Access the application**
+   - Open http://localhost:3000 in your browser
+
+#### Option 2: Build from Source
+
 1. **Clone the repository**
    ```bash
    git clone https://github.com/Ryderjj89/esv-bible.git
@@ -93,20 +105,41 @@ To enable user authentication and features like favorites and synced preferences
 
 Create a `.env` file in the root directory with the following variables:
 
+#### Example Configuration (Authentik)
+
 ```env
 # OpenID Connect Configuration (Required for authentication)
-OIDC_ISSUER=https://your-oidc-provider.com
-OIDC_CLIENT_ID=your-client-id
-OIDC_CLIENT_SECRET=your-client-secret
-OIDC_AUTH_URL=https://your-oidc-provider.com/auth
-OIDC_TOKEN_URL=https://your-oidc-provider.com/token
-OIDC_USERINFO_URL=https://your-oidc-provider.com/userinfo
+# Example using Authentik - replace auth.example.com with your domain
+OIDC_ISSUER=https://auth.example.com/application/o/esv-bible/
+OIDC_CLIENT_ID=your-client-id-from-authentik
+OIDC_CLIENT_SECRET=your-client-secret-from-authentik
+OIDC_AUTH_URL=https://auth.example.com/application/o/authorize/
+OIDC_TOKEN_URL=https://auth.example.com/application/o/token/
+OIDC_USERINFO_URL=https://auth.example.com/application/o/userinfo/
 
 # Optional Configuration
 OIDC_CALLBACK_URL=/auth/callback
 SESSION_SECRET=your-session-secret-change-in-production
 FRONTEND_URL=http://localhost:3000
 NODE_ENV=production
+```
+
+#### Other Provider Examples
+
+**Keycloak:**
+```env
+OIDC_ISSUER=https://keycloak.example.com/realms/your-realm
+OIDC_AUTH_URL=https://keycloak.example.com/realms/your-realm/protocol/openid-connect/auth
+OIDC_TOKEN_URL=https://keycloak.example.com/realms/your-realm/protocol/openid-connect/token
+OIDC_USERINFO_URL=https://keycloak.example.com/realms/your-realm/protocol/openid-connect/userinfo
+```
+
+**Auth0:**
+```env
+OIDC_ISSUER=https://your-tenant.auth0.com/
+OIDC_AUTH_URL=https://your-tenant.auth0.com/authorize
+OIDC_TOKEN_URL=https://your-tenant.auth0.com/oauth/token
+OIDC_USERINFO_URL=https://your-tenant.auth0.com/userinfo
 ```
 
 ## Features When Authenticated

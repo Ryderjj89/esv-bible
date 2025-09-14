@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate, useParams, useLocation } from 'react-router-dom';
-import { Book, ChevronRight, Moon, Sun } from 'lucide-react';
+import { Book, ChevronRight, Moon, Sun, LogOut } from 'lucide-react';
 import BookSelector from './components/BookSelector';
 import ChapterSelector from './components/ChapterSelector';
 import BibleReader from './components/BibleReader';
@@ -220,12 +220,18 @@ function App() {
       navigate(`/book/${urlName}`);
     };
 
+    const handleFavoriteChange = () => {
+      // This will trigger a re-render of the FavoritesMenu
+      setUser((prev: any) => ({ ...prev }));
+    };
+
     return (
       <BookSelector 
         books={books} 
         onBookSelect={handleBookSelect} 
         formatBookName={formatBookName}
         user={user}
+        onFavoriteChange={handleFavoriteChange}
       />
     );
   };
@@ -243,6 +249,11 @@ function App() {
       navigate('/');
     };
 
+    const handleFavoriteChange = () => {
+      // This will trigger a re-render of the FavoritesMenu
+      setUser((prev: any) => ({ ...prev }));
+    };
+
     if (!bookName || !actualBookName || !books.includes(actualBookName)) {
       return <div>Book not found</div>;
     }
@@ -254,6 +265,7 @@ function App() {
         onBack={handleBack}
         formatBookName={formatBookName}
         user={user}
+        onFavoriteChange={handleFavoriteChange}
       />
     );
   };
@@ -389,7 +401,7 @@ function App() {
                         className="text-sm px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
                       >
                         <span className="hidden sm:inline">Logout</span>
-                        <span className="sm:hidden">⏻</span>
+                        <LogOut className="sm:hidden h-4 w-4" />
                       </button>
                     </div>
                   ) : (

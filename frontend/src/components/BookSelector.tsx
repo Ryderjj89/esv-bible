@@ -6,9 +6,10 @@ interface BookSelectorProps {
   onBookSelect: (book: string) => void;
   formatBookName: (bookName: string) => string;
   user?: any;
+  onFavoriteChange?: () => void;
 }
 
-const BookSelector: React.FC<BookSelectorProps> = ({ books, onBookSelect, formatBookName, user }) => {
+const BookSelector: React.FC<BookSelectorProps> = ({ books, onBookSelect, formatBookName, user, onFavoriteChange }) => {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
 
@@ -85,6 +86,7 @@ const BookSelector: React.FC<BookSelectorProps> = ({ books, onBookSelect, format
                 return newFavorites;
               });
               console.log('Removed book favorite:', book);
+              onFavoriteChange?.(); // Notify parent to refresh favorites menu
             }
           }
         }
@@ -104,6 +106,7 @@ const BookSelector: React.FC<BookSelectorProps> = ({ books, onBookSelect, format
         if (response.ok) {
           setFavorites(prev => new Set(prev).add(book));
           console.log('Added book favorite:', book);
+          onFavoriteChange?.(); // Notify parent to refresh favorites menu
         } else {
           console.error('Failed to add favorite:', response.status, response.statusText);
         }

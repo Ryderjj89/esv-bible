@@ -8,9 +8,10 @@ interface ChapterSelectorProps {
   onBack: () => void;
   formatBookName: (bookName: string) => string;
   user?: any;
+  onFavoriteChange?: () => void;
 }
 
-const ChapterSelector: React.FC<ChapterSelectorProps> = ({ book, onChapterSelect, onBack, formatBookName, user }) => {
+const ChapterSelector: React.FC<ChapterSelectorProps> = ({ book, onChapterSelect, onBack, formatBookName, user, onFavoriteChange }) => {
   const [chapters, setChapters] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
@@ -79,6 +80,7 @@ const ChapterSelector: React.FC<ChapterSelectorProps> = ({ book, onChapterSelect
               newFavorites.delete(chapter);
               return newFavorites;
             });
+            onFavoriteChange?.(); // Notify parent to refresh favorites menu
           }
         }
       } else {
@@ -97,6 +99,7 @@ const ChapterSelector: React.FC<ChapterSelectorProps> = ({ book, onChapterSelect
         
         if (response.ok) {
           setFavorites(prev => new Set(prev).add(chapter));
+          onFavoriteChange?.(); // Notify parent to refresh favorites menu
         }
       }
     } catch (error) {

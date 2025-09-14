@@ -135,10 +135,10 @@ const FavoritesMenu: React.FC<FavoritesMenuProps> = ({ user, formatBookName, get
             </button>
             <button
               onClick={() => removeFavorite(favorite.id)}
-              className="p-1 opacity-0 group-hover:opacity-100 hover:bg-red-100 dark:hover:bg-red-900 rounded transition-opacity"
+              className="p-2 hover:bg-red-100 dark:hover:bg-red-900 rounded transition-colors"
               title="Remove favorite"
             >
-              <X className="h-3 w-3 text-red-500" />
+              <X className="h-4 w-4 text-red-500" />
             </button>
           </div>
         ))}

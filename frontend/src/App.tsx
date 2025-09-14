@@ -269,7 +269,7 @@ function App() {
 
     const handleFavoriteChange = () => {
       // This will trigger a re-render of the FavoritesMenu
-      setUser(prev => ({ ...prev }));
+      setUser((prev: any) => ({ ...prev }));
     };
 
     if (!bookName || !chapterNumber || !actualBookName) {

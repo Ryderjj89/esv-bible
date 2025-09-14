@@ -213,8 +213,8 @@ const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack, format
       // Skip empty lines
       if (!line) continue;
 
-      // Check if line starts with verse number (e.g., "1 ", "2 ", etc.)
-      const verseMatch = line.match(/^(\d+)\s+(.+)$/);
+      // Check if line starts with verse number (e.g., "1. ", "2. ", etc.)
+      const verseMatch = line.match(/^(\d+)\.\s+(.+)$/);
       if (verseMatch) {
         const verseNumber = verseMatch[1];
         const verseText = verseMatch[2];

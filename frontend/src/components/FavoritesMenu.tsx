@@ -166,7 +166,7 @@ const FavoritesMenu: React.FC<FavoritesMenuProps> = ({ user, formatBookName, get
 
       {/* Favorites Dropdown */}
       {isOpen && (
-        <div className="absolute top-full right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] sm:max-w-80 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 max-h-96 overflow-hidden transform sm:transform-none -translate-x-4 sm:translate-x-0">
+        <div className="absolute top-full right-0 mt-2 w-80 max-w-[calc(100vw-1rem)] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 max-h-96 overflow-hidden">
           <div className="p-3 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
               <h3 className="font-medium text-gray-900 dark:text-gray-100">My Favorites</h3>

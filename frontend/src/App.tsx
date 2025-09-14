@@ -379,15 +379,8 @@ function App() {
               )}
             </div>
 
-            {/* User Authentication, Favorites & Dark Mode */}
+            {/* User Authentication & Dark Mode */}
             <div className="flex items-center space-x-2">
-              {/* Favorites Menu - Only for authenticated users */}
-              <FavoritesMenu 
-                user={user}
-                formatBookName={formatBookName}
-                getBookUrlName={getBookUrlName}
-              />
-
               {/* Authentication Button */}
               {authAvailable && (
                 <div>
@@ -431,6 +424,19 @@ function App() {
           </div>
         </div>
       </header>
+
+      {/* Favorites Menu - Positioned below header for authenticated users */}
+      {user && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+          <div className="flex justify-end">
+            <FavoritesMenu 
+              user={user}
+              formatBookName={formatBookName}
+              getBookUrlName={getBookUrlName}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

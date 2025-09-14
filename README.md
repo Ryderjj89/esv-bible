@@ -2,19 +2,40 @@
 
 A Docker-based ESV Bible application with markdown content, featuring a React frontend and Node.js backend.
 
+> **Created with AI**: This entire application was built using Visual Studio Code with [Cline](https://github.com/cline/cline), an AI coding assistant that helped develop every aspect of the project from initial setup to final deployment.
+
 ## Features
 
-- **Complete ESV Bible** in markdown format
-- **Clean URLs** like `/book/Genesis/chapter/1`
-- **Mobile responsive** design with adaptive navigation
-- **Dark mode** support with persistent preferences
-- **Font size controls** (Small, Medium, Large)
-- **Chapter navigation** with Previous/Next buttons
-- **Times New Roman typography** for traditional Bible reading
-- **Professional favicon** with book icon
+### Core Bible Reading Experience
+- **Complete ESV Bible** in markdown format with all 66 books
+- **Clean URLs** like `/book/Genesis/chapter/1` for easy sharing
+- **Mobile responsive** design with adaptive navigation and touch-friendly controls
+- **Dark mode** support with persistent preferences across sessions
+- **Font size controls** (Small, Medium, Large) with instant preview
+- **Chapter navigation** with Previous/Next buttons for seamless reading
+- **Verse-by-verse display** with clear formatting and numbering
+- **Professional typography** optimized for extended reading sessions
+- **Fast loading** with optimized content delivery
+
+### Advanced User Features (When Authenticated)
+- **Three-level favorites system**:
+  - **Book favorites** - Save entire books for quick access
+  - **Chapter favorites** - Bookmark specific chapters
+  - **Verse favorites** - Save individual verses with optional notes
+- **Real-time favorites updates** - Changes appear instantly without page refresh
+- **Organized favorites menu** - Categorized sections with icons and counts
+- **Cross-device sync** - Preferences and favorites sync across all devices
+- **User preferences storage** - Font size and dark mode settings preserved
+- **Touch-optimized mobile interface** - Perfect experience on phones and tablets
+
+### Technical Features
 - **Optional OpenID Connect authentication** for user features
-- **User preferences** sync (when authenticated)
-- **Favorites system** for bookmarking verses (when authenticated)
+- **SQLite database** for user data with automatic setup
+- **RESTful API** for all user operations
+- **Docker containerization** with persistent volume support
+- **Multi-stage builds** for optimized production deployment
+- **Professional favicon** with book icon
+- **SEO-friendly URLs** and metadata
 
 ## Quick Start
 
@@ -26,24 +47,43 @@ A Docker-based ESV Bible application with markdown content, featuring a React fr
    cd esv-bible
    ```
 
-2. **Build and run with Docker**
+2. **Build and run with Docker (with persistent storage)**
    ```bash
    docker build -t esv-bible .
-   docker run -p 3000:3000 esv-bible
+   docker run -p 3000:3000 -v esv-bible-data:/app/backend/data esv-bible
    ```
 
 3. **Access the application**
    - Open http://localhost:3000 in your browser
 
-### Docker Compose Setup
+### Docker Compose Setup (Recommended)
 
 1. **Run with docker-compose**
    ```bash
    docker-compose up -d
    ```
+   
+   This will:
+   - Build the application automatically
+   - Create a persistent volume for database storage
+   - Start the service in the background
+   - Make the app available at http://localhost:3000
 
-2. **Access the application**
-   - Open http://localhost:3000 in your browser
+2. **View logs (optional)**
+   ```bash
+   docker-compose logs -f
+   ```
+
+3. **Stop the application**
+   ```bash
+   docker-compose down
+   ```
+
+4. **Update to latest version**
+   ```bash
+   docker-compose pull
+   docker-compose up -d
+   ```
 
 ## Authentication Setup (Optional)
 
@@ -72,15 +112,22 @@ NODE_ENV=production
 ## Features When Authenticated
 
 ### User Preferences
-- **Font size** synced across devices
+- **Font size** synced across devices (Small, Medium, Large)
 - **Dark mode** preference synced across devices
 - **Persistent settings** stored in database
+- **Instant updates** - Changes apply immediately across all sessions
 
-### Favorites System
-- **Bookmark verses** for easy reference
-- **Add notes** to favorite verses
-- **Organize favorites** by book and chapter
-- **Quick access** to saved verses
+### Advanced Favorites System
+- **Three-level bookmarking**:
+  - **Books** - Save entire books like "Genesis" or "Matthew"
+  - **Chapters** - Bookmark specific chapters like "John 3"
+  - **Verses** - Save individual verses like "John 3:16"
+- **Real-time updates** - Favorites appear instantly in menu without page refresh
+- **Organized display** - Categorized sections with icons and counts
+- **Quick navigation** - Click any favorite to jump directly to that content
+- **Easy management** - Add/remove favorites with single click
+- **Mobile optimized** - Touch-friendly interface on all devices
+- **Cross-device sync** - Access your favorites from any device
 
 ### API Endpoints (Authenticated)
 
@@ -90,9 +137,8 @@ POST   /auth/logout         - Logout user
 GET    /api/preferences     - Get user preferences
 PUT    /api/preferences     - Update user preferences
 GET    /api/favorites       - Get user favorites
-POST   /api/favorites       - Add favorite verse
+POST   /api/favorites       - Add favorite (book/chapter/verse)
 DELETE /api/favorites/:id   - Remove favorite
-GET    /api/favorites/check - Check if verse is favorited
 ```
 
 ## Development
@@ -134,40 +180,60 @@ The application uses SQLite for user data when authentication is enabled:
 - **Location**: `backend/data/bible.db`
 - **Tables**: `users`, `user_preferences`, `favorites`
 - **Automatic setup**: Database and tables created on first run
+- **Persistent storage**: Data preserved across container restarts
+- **Backup friendly**: Single file database for easy backups
 
 ## Docker Configuration
 
 ### Dockerfile
-- Multi-stage build for optimized production image
-- Node.js backend with React frontend
-- Persistent volume for database storage
+- **Multi-stage build** for optimized production image
+- **Node.js backend** with React frontend
+- **Persistent volume** support for database storage
+- **Security optimized** with non-root user
+- **Minimal image size** with production dependencies only
 
 ### docker-compose.yml
-- Single service configuration
-- Volume mounting for database persistence
-- Environment variable support
+- **Single service** configuration for easy deployment
+- **Volume mounting** for database persistence (`esv-bible-data` volume)
+- **Environment variable** support via `.env` file
+- **Automatic restart** policy for reliability
+- **Port mapping** (3000:3000) for web access
 
 ## URL Structure
 
-- **Home**: `/` - Book selection
+- **Home**: `/` - Book selection with Old/New Testament organization
 - **Book chapters**: `/book/Genesis` - Chapter selection for Genesis
-- **Chapter reading**: `/book/Genesis/chapter/1` - Genesis Chapter 1
+- **Chapter reading**: `/book/Genesis/chapter/1` - Genesis Chapter 1 with verse navigation
 - **Clean URLs**: Professional book names without technical prefixes
+- **SEO friendly**: Descriptive URLs for search engine optimization
+
+## Mobile Experience
+
+- **Responsive design** that adapts to all screen sizes
+- **Touch-friendly** navigation with proper button sizing
+- **Mobile-optimized** favorites menu positioned below header
+- **Swipe gestures** for chapter navigation
+- **Readable typography** optimized for mobile screens
+- **Fast loading** on mobile networks
+- **Offline capable** once initially loaded
 
 ## Browser Support
 
-- **Modern browsers** with ES6+ support
-- **Mobile responsive** design
-- **Touch-friendly** navigation
-- **Keyboard accessible** controls
+- **Modern browsers** with ES6+ support (Chrome, Firefox, Safari, Edge)
+- **Mobile browsers** on iOS and Android
+- **Keyboard accessible** controls for accessibility
+- **Screen reader** compatible
+- **Progressive enhancement** for older browsers
 
 ## Contributing
 
 1. Fork the repository
-2. Create a feature branch
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
 3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+4. Test thoroughly on both desktop and mobile
+5. Commit your changes (`git commit -m 'Add amazing feature'`)
+6. Push to the branch (`git push origin feature/amazing-feature`)
+7. Submit a pull request
 
 ## License
 
@@ -176,10 +242,19 @@ MIT License - see LICENSE file for details
 ## Support
 
 For issues and questions:
-- Create an issue on GitHub
-- Check existing documentation
-- Review environment variable configuration
+- **GitHub Issues**: Create an issue for bugs or feature requests
+- **Documentation**: Check this README for setup instructions
+- **Environment**: Review environment variable configuration
+- **Logs**: Use `docker-compose logs` to troubleshoot issues
+
+## Acknowledgments
+
+- **ESV Bible text** - Crossway Bibles
+- **React** - Frontend framework
+- **Node.js** - Backend runtime
+- **Docker** - Containerization platform
+- **Cline AI** - Development assistant that built this entire application
 
 ---
 
-**Note**: Authentication is completely optional. The application works fully without any authentication setup, providing a clean Bible reading experience. Authentication only adds user-specific features like favorites and synced preferences.
+**Note**: Authentication is completely optional. The application works fully without any authentication setup, providing a clean Bible reading experience. Authentication only adds user-specific features like favorites and synced preferences across devices.

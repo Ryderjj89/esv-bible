@@ -433,6 +433,7 @@ function App() {
               user={user}
               formatBookName={formatBookName}
               getBookUrlName={getBookUrlName}
+              onFavoriteChange={() => setUser((prev: any) => ({ ...prev }))}
             />
           </div>
         </div>

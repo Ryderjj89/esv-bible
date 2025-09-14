@@ -16,9 +16,10 @@ interface FavoritesMenuProps {
   user: any;
   formatBookName: (bookName: string) => string;
   getBookUrlName: (bookName: string) => string;
+  onFavoriteChange?: () => void;
 }
 
-const FavoritesMenu: React.FC<FavoritesMenuProps> = ({ user, formatBookName, getBookUrlName }) => {
+const FavoritesMenu: React.FC<FavoritesMenuProps> = ({ user, formatBookName, getBookUrlName, onFavoriteChange }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [loading, setLoading] = useState(false);
@@ -60,6 +61,7 @@ const FavoritesMenu: React.FC<FavoritesMenuProps> = ({ user, formatBookName, get
       
       if (response.ok) {
         setFavorites(favorites.filter(f => f.id !== favoriteId));
+        onFavoriteChange?.(); // Notify parent to refresh other components
       }
     } catch (error) {
       console.error('Failed to remove favorite:', error);
@@ -158,8 +160,7 @@ const FavoritesMenu: React.FC<FavoritesMenuProps> = ({ user, formatBookName, get
         className="flex items-center space-x-1 px-3 py-1 text-sm bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded hover:bg-yellow-200 dark:hover:bg-yellow-800 transition-colors"
       >
         <Star className="h-4 w-4" />
-        <span className="hidden sm:inline">Favorites</span>
-        <span className="sm:hidden">★</span>
+        <span>Favorites</span>
         {favorites.length > 0 && (
           <span className="bg-yellow-600 text-white text-xs rounded-full px-1.5 py-0.5 min-w-[1.25rem] text-center">
             {favorites.length}

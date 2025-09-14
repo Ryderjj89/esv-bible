@@ -45,7 +45,7 @@ A Docker-based ESV Bible application with markdown content, featuring a React fr
 
 1. **Run directly from Docker Hub**
    ```bash
-   docker run -d -p 3000:3000 -v esv-bible-data:/app/backend/data --name esv-bible ryderjj89/esv-bible:latest
+   docker run -d -p 3000:3000 -v esv-bible_data:/app/backend/data --name esv-bible ryderjj89/esv-bible:latest
    ```
 
 2. **Access the application**
@@ -62,7 +62,7 @@ A Docker-based ESV Bible application with markdown content, featuring a React fr
 2. **Build and run with Docker (with persistent storage)**
    ```bash
    docker build -t esv-bible .
-   docker run -p 3000:3000 -v esv-bible-data:/app/backend/data esv-bible
+   docker run -p 3000:3000 -v esv-bible_data:/app/backend/data esv-bible
    ```
 
 3. **Access the application**

@@ -220,16 +220,20 @@ const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack, format
         const verseText = verseMatch[2];
 
         verses.push(
-          <div key={`verse-${verseNumber}`} className="mb-4 flex items-start hover:bg-gray-50 dark:hover:bg-gray-800 p-2 rounded transition-colors group">
+          <div key={`verse-${verseNumber}`} className="mb-4 flex items-start p-2 rounded transition-colors">
+            <div className="flex-1">
+              <span className="verse-number font-semibold text-blue-600 dark:text-blue-400 mr-2">{verseNumber}</span>
+              <span className="bible-text">{verseText}</span>
+            </div>
             {/* Star button - only show for authenticated users */}
             {user && (
               <button
                 onClick={() => toggleFavorite(verseNumber)}
-                className="mr-2 mt-1 p-1 rounded transition-all opacity-60 hover:opacity-100 hover:bg-gray-200 dark:hover:bg-gray-600"
+                className="ml-2 mt-1 p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                 title={favorites.has(verseNumber) ? 'Remove from favorites' : 'Add to favorites'}
               >
                 <Star 
-                  className={`h-3 w-3 ${
+                  className={`h-4 w-4 ${
                     favorites.has(verseNumber) 
                       ? 'text-yellow-500 fill-yellow-500' 
                       : 'text-gray-400 hover:text-yellow-500'
@@ -237,10 +241,6 @@ const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack, format
                 />
               </button>
             )}
-            <div className="flex-1">
-              <span className="verse-number font-semibold text-blue-600 dark:text-blue-400 mr-2">{verseNumber}</span>
-              <span className="bible-text">{verseText}</span>
-            </div>
           </div>
         );
       } else if (line.startsWith('#')) {
@@ -330,7 +330,7 @@ const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack, format
         </h1>
         {user && (
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-            Hover over verses to see ★ and add them to your favorites
+            Click the ★ next to verses to add them to your favorites
           </p>
         )}
       </div>

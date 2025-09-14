@@ -372,17 +372,18 @@ function App() {
 
               {/* Authentication Button */}
               {authAvailable && (
-                <div className="hidden sm:block">
+                <div>
                   {user ? (
                     <div className="flex items-center space-x-2">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">
+                      <span className="hidden sm:inline text-sm text-gray-600 dark:text-gray-400">
                         {user.name || user.email}
                       </span>
                       <button
                         onClick={handleLogout}
                         className="text-sm px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
                       >
-                        Logout
+                        <span className="hidden sm:inline">Logout</span>
+                        <span className="sm:hidden">⏻</span>
                       </button>
                     </div>
                   ) : (
@@ -390,7 +391,8 @@ function App() {
                       onClick={handleLogin}
                       className="text-sm px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
                     >
-                      Login
+                      <span className="hidden sm:inline">Login</span>
+                      <span className="sm:hidden">👤</span>
                     </button>
                   )}
                 </div>

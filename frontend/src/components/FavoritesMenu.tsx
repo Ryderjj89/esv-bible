@@ -70,8 +70,12 @@ const FavoritesMenu: React.FC<FavoritesMenuProps> = ({ user, formatBookName, get
     const urlBookName = getBookUrlName(favorite.book);
     
     if (favorite.chapter) {
-      // Navigate to chapter
-      navigate(`/book/${urlBookName}/chapter/${favorite.chapter}`);
+      // Navigate to chapter, with verse hash if it's a verse favorite
+      let url = `/book/${urlBookName}/chapter/${favorite.chapter}`;
+      if (favorite.verse_start) {
+        url += `#verse-${favorite.verse_start}`;
+      }
+      navigate(url);
     } else {
       // Navigate to book
       navigate(`/book/${urlBookName}`);

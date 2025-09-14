@@ -27,6 +27,26 @@ const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack, format
     loadChapters();
   }, [book, chapter]);
 
+  // Scroll to verse if specified in URL hash
+  useEffect(() => {
+    if (!loading && content) {
+      // Check if there's a verse hash in the URL
+      const hash = window.location.hash;
+      if (hash.startsWith('#verse-')) {
+        const verseElement = document.getElementById(hash.substring(1));
+        if (verseElement) {
+          // Small delay to ensure content is rendered
+          setTimeout(() => {
+            verseElement.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'center' 
+            });
+          }, 100);
+        }
+      }
+    }
+  }, [loading, content]);
+
   // Load favorites when user is available
   useEffect(() => {
     if (user) {
@@ -224,7 +244,7 @@ const BibleReader: React.FC<BibleReaderProps> = ({ book, chapter, onBack, format
         const verseText = verseMatch[2];
 
         verses.push(
-          <div key={`verse-${verseNumber}`} className="mb-4 flex items-start p-2 rounded transition-colors">
+          <div key={`verse-${verseNumber}`} id={`verse-${verseNumber}`} className="mb-4 flex items-start p-2 rounded transition-colors">
             <div className="flex-1">
               <span className="verse-number font-semibold text-blue-600 dark:text-blue-400 mr-2">{verseNumber}</span>
               <span className="bible-text">{verseText}</span>

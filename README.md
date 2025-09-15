@@ -204,7 +204,6 @@ DELETE /api/favorites/:id   - Remove favorite
 
 3. **Access the application**
    - Frontend: http://localhost:3000
-   - Backend API: http://localhost:3001
 
 ## Database
 

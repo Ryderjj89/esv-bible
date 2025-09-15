@@ -8,6 +8,7 @@ A Docker-based ESV Bible application with markdown content, featuring a React fr
 
 ### Core Bible Reading Experience
 - **Complete ESV Bible** in markdown format with all 66 books
+- **Powerful search engine** - Find any verse, word, or phrase across the entire Bible
 - **Clean URLs** like `/book/Genesis/chapter/1` for easy sharing
 - **Mobile responsive** design with adaptive navigation and touch-friendly controls
 - **Dark mode** support with persistent preferences across sessions
@@ -141,6 +142,39 @@ OIDC_AUTH_URL=https://your-tenant.auth0.com/authorize
 OIDC_TOKEN_URL=https://your-tenant.auth0.com/oauth/token
 OIDC_USERINFO_URL=https://your-tenant.auth0.com/userinfo
 ```
+
+## Bible Search Feature
+
+### Powerful Search Engine
+- **Full-text search** across all 66 books and ~31,000 verses
+- **Real-time results** with 300ms debouncing for smooth typing
+- **Contextual results** - See surrounding verses for better understanding
+- **Direct verse navigation** - Click any result to jump directly to that verse
+- **Book filtering** - Search within specific books or across the entire Bible
+- **Highlighted search terms** - Visual emphasis on matching words in results
+- **Mobile-optimized** - Touch-friendly search interface on all devices
+- **Fast indexing** - In-memory search index for instant results
+
+### Search Interface
+- **Header search button** - Quick access from any page
+- **Modal overlay** - Search without leaving your current reading
+- **Dedicated search page** - Full-screen search experience at `/search`
+- **Auto-complete suggestions** - Smart word completion as you type
+- **Result relevance scoring** - Most relevant verses appear first
+- **Context display** - See verses before and after each result
+
+### Search API Endpoints
+
+```
+GET    /api/search          - Search Bible text
+GET    /api/search/suggestions - Get search auto-complete suggestions
+```
+
+**Search Parameters:**
+- `q` - Search query (minimum 2 characters)
+- `book` - Filter by specific book (optional)
+- `limit` - Maximum results to return (default: 50)
+- `context` - Include surrounding verses (default: true)
 
 ## Features When Authenticated
 
@@ -282,6 +316,7 @@ For issues and questions:
 ## Acknowledgments
 
 - **ESV Bible text** - Crossway Bibles
+- **Bible data source** - [mdbible](https://github.com/lguenth/mdbible) - Markdown formatted Bible text
 - **React** - Frontend framework
 - **Node.js** - Backend runtime
 - **Docker** - Containerization platform

@@ -126,9 +126,18 @@ app.get('/books/:book', async (req, res) => {
 app.get('/books/:book/:chapter', async (req, res) => {
   try {
     const { book, chapter } = req.params;
-    // Format chapter number with leading zero if needed (e.g., "1" -> "01")
-    const paddedChapter = chapter.padStart(2, '0');
-    const chapterPath = path.join(BIBLE_DATA_DIR, book, `Chapter_${paddedChapter}.md`);
+    
+    // Check if chapter already includes "Chapter_" prefix (from frontend)
+    let chapterFileName;
+    if (chapter.startsWith('Chapter_')) {
+      chapterFileName = `${chapter}.md`;
+    } else {
+      // Legacy support: if just a number, format with leading zero
+      const paddedChapter = chapter.padStart(2, '0');
+      chapterFileName = `Chapter_${paddedChapter}.md`;
+    }
+    
+    const chapterPath = path.join(BIBLE_DATA_DIR, book, chapterFileName);
 
     const content = await readMarkdownFile(chapterPath);
     res.type('text/markdown').send(content);

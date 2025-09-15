@@ -126,7 +126,9 @@ app.get('/books/:book', async (req, res) => {
 app.get('/books/:book/:chapter', async (req, res) => {
   try {
     const { book, chapter } = req.params;
-    const chapterPath = path.join(BIBLE_DATA_DIR, book, `${chapter}.md`);
+    // Format chapter number with leading zero if needed (e.g., "1" -> "01")
+    const paddedChapter = chapter.padStart(2, '0');
+    const chapterPath = path.join(BIBLE_DATA_DIR, book, `Chapter_${paddedChapter}.md`);
 
     const content = await readMarkdownFile(chapterPath);
     res.type('text/markdown').send(content);

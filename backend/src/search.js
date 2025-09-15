@@ -16,8 +16,16 @@ class BibleSearchEngine {
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim();
       
-      // Match verse patterns like "1 In the beginning..." or "**1** In the beginning..."
-      const verseMatch = line.match(/^(\*\*)?(\d+)(\*\*)?\s+(.+)$/);
+      // Skip empty lines and headers
+      if (!line || line.startsWith('#')) {
+        continue;
+      }
+      
+      // Match verse patterns:
+      // - "1. In the beginning..." (numbered list format)
+      // - "1 In the beginning..." (simple number format)
+      // - "**1** In the beginning..." (bold number format)
+      const verseMatch = line.match(/^(\*\*)?(\d+)(\*\*)?[.\s]\s*(.+)$/);
       
       if (verseMatch) {
         const verseNumber = parseInt(verseMatch[2]);

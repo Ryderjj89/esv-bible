@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate, useParams, useLocation } from 'react-router-dom';
-import { Book, ChevronRight, Moon, Sun, LogOut } from 'lucide-react';
+import { Book, ChevronRight, Moon, Sun, LogOut, Search } from 'lucide-react';
 import BookSelector from './components/BookSelector';
 import ChapterSelector from './components/ChapterSelector';
 import BibleReader from './components/BibleReader';
 import FavoritesMenu from './components/FavoritesMenu';
+import SearchComponent from './components/SearchComponent';
 import { getBooks } from './services/api';
 
 interface BookData {
@@ -22,6 +23,7 @@ function App() {
     return saved ? JSON.parse(saved) : false;
   });
   const [error, setError] = useState<string>('');
+  const [showSearch, setShowSearch] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -379,8 +381,16 @@ function App() {
               )}
             </div>
 
-            {/* User Authentication & Dark Mode */}
+            {/* Search, User Authentication & Dark Mode */}
             <div className="flex items-center space-x-2">
+              {/* Search Button */}
+              <button
+                onClick={() => setShowSearch(true)}
+                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                title="Search Bible"
+              >
+                <Search className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600 dark:text-gray-400" />
+              </button>
               {/* Authentication Button */}
               {authAvailable && (
                 <div>
@@ -439,12 +449,31 @@ function App() {
         </div>
       )}
 
+      {/* Search Modal */}
+      {showSearch && (
+        <SearchComponent
+          formatBookName={formatBookName}
+          getBookUrlName={getBookUrlName}
+          books={books}
+          onClose={() => setShowSearch(false)}
+          isModal={true}
+        />
+      )}
+
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/book/:bookName" element={<BookPage />} />
           <Route path="/book/:bookName/chapter/:chapterNumber" element={<ChapterPage />} />
+          <Route path="/search" element={
+            <SearchComponent
+              formatBookName={formatBookName}
+              getBookUrlName={getBookUrlName}
+              books={books}
+              isModal={false}
+            />
+          } />
         </Routes>
       </main>
     </div>

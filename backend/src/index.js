@@ -5,6 +5,7 @@ const path = require('path');
 const fs = require('fs').promises;
 const { configureAuth, requireAuth, optionalAuth } = require('./auth');
 const { preferencesOps, favoritesOps } = require('./database');
+const BibleSearchEngine = require('./search');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -33,6 +34,9 @@ app.use(express.static(path.join(__dirname, '../../frontend/build')));
 
 // Bible data directory
 const BIBLE_DATA_DIR = path.join(__dirname, '../../bible-data');
+
+// Initialize search engine
+const searchEngine = new BibleSearchEngine(BIBLE_DATA_DIR);
 
 // Helper function to read markdown files
 async function readMarkdownFile(filePath) {
@@ -128,6 +132,53 @@ app.get('/books/:book/:chapter', async (req, res) => {
     res.type('text/markdown').send(content);
   } catch (error) {
     res.status(404).json({ error: `Chapter ${chapter} not found in book '${book}'` });
+  }
+});
+
+// Search routes
+app.get('/api/search', async (req, res) => {
+  try {
+    const { q: query, book, limit, context } = req.query;
+    
+    if (!query || query.trim().length < 2) {
+      return res.status(400).json({ error: 'Query must be at least 2 characters long' });
+    }
+
+    const options = {
+      bookFilter: book || null,
+      limit: parseInt(limit) || 50,
+      includeContext: context !== 'false',
+      contextSize: 2
+    };
+
+    const results = await searchEngine.search(query, options);
+    
+    res.json({
+      query,
+      results,
+      total: results.length,
+      hasMore: results.length === options.limit
+    });
+  } catch (error) {
+    console.error('Search error:', error);
+    res.status(500).json({ error: 'Search failed. Please try again.' });
+  }
+});
+
+app.get('/api/search/suggestions', async (req, res) => {
+  try {
+    const { q: query, limit } = req.query;
+    
+    if (!query || query.trim().length < 2) {
+      return res.json({ suggestions: [] });
+    }
+
+    const suggestions = await searchEngine.getSearchSuggestions(query, parseInt(limit) || 10);
+    
+    res.json({ suggestions });
+  } catch (error) {
+    console.error('Search suggestions error:', error);
+    res.status(500).json({ error: 'Failed to get search suggestions' });
   }
 });
 

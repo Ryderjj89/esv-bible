@@ -77,7 +77,9 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
   // Handle result click
   const handleResultClick = (result: SearchResult) => {
     const urlBookName = getBookUrlName(formatBookName(result.book));
-    navigate(`/book/${urlBookName}/chapter/${result.chapter}`);
+    // Navigate to chapter with verse hash to scroll directly to the verse
+    const url = `/book/${urlBookName}/chapter/${result.chapter}#verse-${result.verse}`;
+    navigate(url);
     if (onClose) onClose();
   };
 

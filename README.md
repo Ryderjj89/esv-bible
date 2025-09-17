@@ -22,8 +22,8 @@ A Docker-based ESV Bible application with markdown content, featuring a React fr
 - **Three-level favorites system**:
   - **Book favorites** - Save entire books for quick access
   - **Chapter favorites** - Bookmark specific chapters
-  - **Verse favorites** - Save individual verses with optional notes
-- **Real-time favorites updates** - Changes appear instantly without page refresh
+  - **Verse favorites** - Save individual verses
+- **Real-time favorites updates** - Changes appear instantly
 - **Organized favorites menu** - Categorized sections with icons and counts
 - **Cross-device sync** - Preferences and favorites sync across all devices
 - **User preferences storage** - Font size and dark mode settings preserved

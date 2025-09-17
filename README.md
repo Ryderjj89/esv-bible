@@ -27,7 +27,6 @@ A Docker-based ESV Bible application with markdown content, featuring a React fr
 - **Organized favorites menu** - Categorized sections with icons and counts
 - **Cross-device sync** - Preferences and favorites sync across all devices
 - **User preferences storage** - Font size and dark mode settings preserved
-- **Touch-optimized mobile interface** - Perfect experience on phones and tablets
 
 ### Technical Features
 - **Optional OpenID Connect authentication** for user features

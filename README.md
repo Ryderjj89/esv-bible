@@ -261,7 +261,6 @@ The application uses SQLite for user data when authentication is enabled:
 ### docker-compose.yml
 - **Single service** configuration for easy deployment
 - **Volume mounting** for database persistence (`esv-bible-data` volume)
-- **Environment variable** support via `.env` file
 - **Automatic restart** policy for reliability
 - **Port mapping** (3000:3000) for web access
 
@@ -278,7 +277,6 @@ The application uses SQLite for user data when authentication is enabled:
 - **Responsive design** that adapts to all screen sizes
 - **Touch-friendly** navigation with proper button sizing
 - **Mobile-optimized** favorites menu positioned below header
-- **Swipe gestures** for chapter navigation
 - **Readable typography** optimized for mobile screens
 - **Fast loading** on mobile networks
 - **Offline capable** once initially loaded
@@ -315,7 +313,6 @@ For issues and questions:
 
 ## Acknowledgments
 
-- **ESV Bible text** - Crossway Bibles
 - **Bible data source** - [mdbible](https://github.com/lguenth/mdbible) - Markdown formatted Bible text
 - **React** - Frontend framework
 - **Node.js** - Backend runtime
